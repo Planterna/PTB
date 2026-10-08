@@ -4,7 +4,7 @@ import '../../data/repositories/user_repository.dart';
 import '../../data/datasources/mock/mock_user_datasource.dart';
 
 class UserView extends StatefulWidget {
-  const UserView({Key? key}) : super(key: key);
+  const UserView({super.key});
 
   @override
   State<UserView> createState() => _UserViewState();

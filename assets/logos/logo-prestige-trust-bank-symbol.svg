@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  
+  <g transform="translate(100, 100) scale(2)">
+    
+    <defs>
+      <linearGradient id="ptb-s-m3di1-grad-bm" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <linearGradient id="ptb-s-m3di1-grad-mi" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#A7DBCB" />
+        <stop offset="100%" stop-color="#CDE7FC" />
+      </linearGradient>
+      <linearGradient id="ptb-s-m3di1-grad-ctr" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%" stop-color="#CDE7FC" />
+        <stop offset="50%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <filter id="ptb-s-m3di1-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#A4BCFC" flood-opacity="0.25" />
+      </filter>
+    </defs>
+    <!-- Outer Arch Left (Prestige) -->
+    <path d="M 46 156 L 46 78 C 46 48 70 24 100 24 L 100 42 C 80 42 64 58 64 78 L 64 156 Z" fill="url(#ptb-s-m3di1-grad-bm)" />
+    <!-- Outer Arch Right (Trust) -->
+    <path d="M 154 156 L 154 78 C 154 48 130 24 100 24 L 100 42 C 120 42 136 58 136 78 L 136 156 Z" fill="url(#ptb-s-m3di1-grad-mi)" />
+    <!-- Inner Architectural Pillar -->
+    <path d="M 76 156 L 76 96 C 76 83 87 72 100 72 C 113 72 124 83 124 96 L 124 156 L 108 156 L 108 102 C 108 97.5 104.5 94 100 94 C 95.5 94 92 97.5 92 102 L 92 156 Z" fill="#C4DED6" />
+    <!-- Central Vault Diamond -->
+    <polygon points="100,48 116,66 100,84 84,66" fill="url(#ptb-s-m3di1-grad-ctr)" filter="url(#ptb-s-m3di1-glow)" />
+    <!-- Foundation Plinths -->
+    <rect x="36" y="164" width="128" height="12" rx="2" fill="url(#ptb-s-m3di1-grad-bm)" />
+    <rect x="48" y="180" width="104" height="4" rx="1" fill="url(#ptb-s-m3di1-grad-mi)" opacity="0.85" />
+  
+  </g>
+</svg>

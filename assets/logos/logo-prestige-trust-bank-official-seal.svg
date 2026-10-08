@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800">
+  <defs>
+    <path id="ptb-sl-7an6b-textPathTop" d="M 160 400 A 240 240 0 0 1 640 400" />
+    <path id="ptb-sl-7an6b-textPathBottom" d="M 640 400 A 240 240 0 0 1 160 400" />
+    <linearGradient id="ptb-sl-7an6b-seal-bd" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A4BCFC" />
+      <stop offset="50%" stop-color="#A7DBCB" />
+      <stop offset="100%" stop-color="#CDE7FC" />
+    </linearGradient>
+  </defs>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&amp;family=Plus+Jakarta+Sans:wght@600&amp;display=swap');
+    .seal-top { font-family: 'Cinzel', Georgia, serif; font-size: 26px; font-weight: 700; letter-spacing: 0.22em; fill: #CDE7FC; }
+    .seal-bot { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 0.32em; fill: #C4DED6; }
+  </style>
+  
+  <!-- Seal Concentric Rings -->
+  <circle cx="400" cy="400" r="340" fill="none" stroke="url(#ptb-sl-7an6b-seal-bd)" stroke-width="3" stroke-dasharray="8 6" />
+  <circle cx="400" cy="400" r="320" fill="none" stroke="url(#ptb-sl-7an6b-seal-bd)" stroke-width="1.5" />
+  <circle cx="400" cy="400" r="230" fill="none" stroke="url(#ptb-sl-7an6b-seal-bd)" stroke-width="1.5" />
+  <!-- Text Along Paths -->
+  <text class="seal-top">
+    <textPath href="#ptb-sl-7an6b-textPathTop" startOffset="50%" text-anchor="middle">
+      PRESTIGE TRUST BANK
+    </textPath>
+  </text>
+  <text class="seal-bot">
+    <textPath href="#ptb-sl-7an6b-textPathBottom" startOffset="50%" text-anchor="middle">
+      • SECURITAS ET FIDES • EST. 1924
+    </textPath>
+  </text>
+  <!-- Decorative Stars -->
+  <polygon points="145,400 150,392 155,400 150,408" fill="#A7DBCB" />
+  <polygon points="655,400 650,392 645,400 650,408" fill="#A7DBCB" />
+  <!-- Center Emblem -->
+  <g transform="translate(240, 240) scale(1.6)">
+    
+    <defs>
+      <linearGradient id="ptb-sl-7an6b-grad-bm" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <linearGradient id="ptb-sl-7an6b-grad-mi" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#A7DBCB" />
+        <stop offset="100%" stop-color="#CDE7FC" />
+      </linearGradient>
+      <linearGradient id="ptb-sl-7an6b-grad-ctr" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%" stop-color="#CDE7FC" />
+        <stop offset="50%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <filter id="ptb-sl-7an6b-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#A4BCFC" flood-opacity="0.25" />
+      </filter>
+    </defs>
+    <!-- Outer Arch Left (Prestige) -->
+    <path d="M 46 156 L 46 78 C 46 48 70 24 100 24 L 100 42 C 80 42 64 58 64 78 L 64 156 Z" fill="url(#ptb-sl-7an6b-grad-bm)" />
+    <!-- Outer Arch Right (Trust) -->
+    <path d="M 154 156 L 154 78 C 154 48 130 24 100 24 L 100 42 C 120 42 136 58 136 78 L 136 156 Z" fill="url(#ptb-sl-7an6b-grad-mi)" />
+    <!-- Inner Architectural Pillar -->
+    <path d="M 76 156 L 76 96 C 76 83 87 72 100 72 C 113 72 124 83 124 96 L 124 156 L 108 156 L 108 102 C 108 97.5 104.5 94 100 94 C 95.5 94 92 97.5 92 102 L 92 156 Z" fill="#C4DED6" />
+    <!-- Central Vault Diamond -->
+    <polygon points="100,48 116,66 100,84 84,66" fill="url(#ptb-sl-7an6b-grad-ctr)" filter="url(#ptb-sl-7an6b-glow)" />
+    <!-- Foundation Plinths -->
+    <rect x="36" y="164" width="128" height="12" rx="2" fill="url(#ptb-sl-7an6b-grad-bm)" />
+    <rect x="48" y="180" width="104" height="4" rx="1" fill="url(#ptb-sl-7an6b-grad-mi)" opacity="0.85" />
+  
+  </g>
+</svg>

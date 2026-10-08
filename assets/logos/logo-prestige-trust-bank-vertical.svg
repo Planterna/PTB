@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="1000" height="1000">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;600;700&amp;display=swap');
+    .title-text { font-family: 'Cinzel', Georgia, 'Times New Roman', serif; font-weight: 700; letter-spacing: 0.18em; text-anchor: middle; }
+    .subtitle-text { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-weight: 600; letter-spacing: 0.42em; text-anchor: middle; }
+    .tagline-text { font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-weight: 500; letter-spacing: 0.32em; text-anchor: middle; }
+  </style>
+  
+  <!-- Bank Emblem Centered -->
+  <g transform="translate(325, 120) scale(1.75)">
+    
+    <defs>
+      <linearGradient id="ptb-v-2266b-grad-bm" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <linearGradient id="ptb-v-2266b-grad-mi" x1="100%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#A7DBCB" />
+        <stop offset="100%" stop-color="#CDE7FC" />
+      </linearGradient>
+      <linearGradient id="ptb-v-2266b-grad-ctr" x1="50%" y1="0%" x2="50%" y2="100%">
+        <stop offset="0%" stop-color="#CDE7FC" />
+        <stop offset="50%" stop-color="#A4BCFC" />
+        <stop offset="100%" stop-color="#A7DBCB" />
+      </linearGradient>
+      <filter id="ptb-v-2266b-glow" x="-20%" y="-20%" width="140%" height="140%">
+        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#A4BCFC" flood-opacity="0.25" />
+      </filter>
+    </defs>
+    <!-- Outer Arch Left (Prestige) -->
+    <path d="M 46 156 L 46 78 C 46 48 70 24 100 24 L 100 42 C 80 42 64 58 64 78 L 64 156 Z" fill="url(#ptb-v-2266b-grad-bm)" />
+    <!-- Outer Arch Right (Trust) -->
+    <path d="M 154 156 L 154 78 C 154 48 130 24 100 24 L 100 42 C 120 42 136 58 136 78 L 136 156 Z" fill="url(#ptb-v-2266b-grad-mi)" />
+    <!-- Inner Architectural Pillar -->
+    <path d="M 76 156 L 76 96 C 76 83 87 72 100 72 C 113 72 124 83 124 96 L 124 156 L 108 156 L 108 102 C 108 97.5 104.5 94 100 94 C 95.5 94 92 97.5 92 102 L 92 156 Z" fill="#C4DED6" />
+    <!-- Central Vault Diamond -->
+    <polygon points="100,48 116,66 100,84 84,66" fill="url(#ptb-v-2266b-grad-ctr)" filter="url(#ptb-v-2266b-glow)" />
+    <!-- Foundation Plinths -->
+    <rect x="36" y="164" width="128" height="12" rx="2" fill="url(#ptb-v-2266b-grad-bm)" />
+    <rect x="48" y="180" width="104" height="4" rx="1" fill="url(#ptb-v-2266b-grad-mi)" opacity="0.85" />
+  
+  </g>
+  <!-- Centered Typography Stack -->
+  <text x="500" y="580" font-size="64" fill="#FFFFFF" class="title-text">PRESTIGE</text>
+  <text x="500" y="642" font-size="28" fill="#C4DED6" class="subtitle-text">TRUST BANK</text>
+  <line x1="380" y1="695" x2="620" y2="695" stroke="#A4BCFC" stroke-width="1.5" opacity="0.4" />
+  <text x="500" y="736" font-size="14" fill="#A7DBCB" class="tagline-text">GENEVA · LONDON · ZURICH</text>
+</svg>
