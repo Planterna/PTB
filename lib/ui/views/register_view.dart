@@ -2,10 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../widgets/notification_helper.dart';
+
+import '../../core/helpers/notification_helper.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_assets.dart';
+import '../../core/utils/validators.dart';
+import '../viewmodels/register_viewmodel.dart';
+import '../../data/datasources/mock/mock_auth_datasource.dart';
+import '../../data/repositories/auth_repository.dart';
 
 class RegisterView extends StatefulWidget {
-  const RegisterView({super.key});
+  const RegisterView({Key? key}) : super(key: key);
 
   @override
   State<RegisterView> createState() => _RegisterViewState();
@@ -15,15 +22,23 @@ class _RegisterViewState extends State<RegisterView> {
   bool _acceptTerms = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
 
   final _formKey = GlobalKey<FormState>();
-
   final _cedulaController = TextEditingController();
   final _namesController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  late RegisterViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    final mockDataSource = MockAuthDataSource();
+    final repository = AuthRepository(mockDataSource);
+    _viewModel = RegisterViewModel(repository);
+  }
 
   @override
   void dispose() {
@@ -32,115 +47,56 @@ class _RegisterViewState extends State<RegisterView> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
-  // --- VALIDADORES ---
-
-  String? _validateCedula(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Por favor, ingresa tu número de cédula';
-    }
-    if (value.trim().length != 10) {
-      return 'La cédula debe contener exactamente 10 caracteres';
-    }
-    if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
-      return 'La cédula debe contener solo números';
-    }
-    return null;
-  }
-
-  String? _validateNames(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Por favor, ingresa tus nombres';
-    }
-    return null;
-  }
-
-  String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Por favor, ingresa tu correo electrónico';
-    }
-    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-    if (!emailRegex.hasMatch(value)) {
-      return 'Por favor, ingresa un correo válido';
-    }
-    return null;
-  }
-
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor, ingresa tu contraseña';
-    }
-    if (value.length < 8 || value.length > 12) {
-      return 'La contraseña debe tener entre 8 y 12 caracteres';
-    }
-    if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
-      return 'Debe contener al menos una letra mayúscula';
-    }
-    if (!RegExp(r'(?=.*[0-9])').hasMatch(value)) {
-      return 'Debe contener al menos un número';
-    }
-    if (!RegExp(r'(?=.*[!@#\$&*~_.,-])').hasMatch(value)) {
-      return 'Debe contener al menos un carácter especial';
-    }
-    return null;
-  }
-
-  String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Por favor, confirma tu contraseña';
-    }
-    if (value != _passwordController.text) {
-      return 'Las contraseñas no coinciden';
-    }
-    return null;
-  }
-
-  // Widget builder helper
   Widget _buildTextField({
     required String label,
     required String hint,
     required TextEditingController controller,
     required String? Function(String?) validator,
-    bool isPassword = false,
-    bool isConfirmPassword = false,
     TextInputType keyboardType = TextInputType.text,
     List<TextInputFormatter>? inputFormatters,
+    bool isPassword = false,
+    bool isConfirmPassword = false,
   }) {
     bool obscureText = false;
-    if (isPassword) obscureText = _obscurePassword;
-    if (isConfirmPassword) obscureText = _obscureConfirmPassword;
+    if (isPassword) {
+      obscureText = _obscurePassword;
+    } else if (isConfirmPassword) {
+      obscureText = _obscureConfirmPassword;
+    }
 
     return <Widget>[
       Text(label)
-          .textColor(const Color(0xFFA8AEB8))
+          .textColor(AppColors.textMuted)
           .fontSize(14)
           .padding(bottom: 8),
       TextFormField(
         controller: controller,
         validator: validator,
-        obscureText: obscureText,
         keyboardType: keyboardType,
         inputFormatters: inputFormatters,
-        style: const TextStyle(color: Color(0xFFFFFFFF), fontSize: 16),
+        obscureText: obscureText,
+        style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Color(0xFFA8AEB8)),
+          hintStyle: const TextStyle(color: AppColors.textMuted),
           filled: true,
-          fillColor: const Color(0xFF14171D),
+          fillColor: AppColors.surface,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide.none,
           ),
-          errorStyle: const TextStyle(color: Color(0xFFFF8A8A)),
+          errorStyle: const TextStyle(color: AppColors.error),
           errorMaxLines: 2, 
           suffixIcon: (isPassword || isConfirmPassword)
               ? IconButton(
                   icon: Icon(
                     obscureText ? Icons.visibility_off : Icons.visibility,
-                    color: const Color(0xFFA8AEB8),
+                    color: AppColors.textMuted,
                     size: 24,
                   ),
                   onPressed: () {
@@ -164,7 +120,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF000000),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Form(
@@ -172,39 +128,36 @@ class _RegisterViewState extends State<RegisterView> {
             child: <Widget>[
               const SizedBox(height: 40),
               
-              // Logo de la Aplicación
               SvgPicture.asset(
-                'assets/logos/logo-prestige-trust-bank-small-icon.svg',
+                AppAssets.logoSmall,
                 height: 48,
                 width: 48,
               )
                   .padding(all: 16)
                   .decorated(
-                    color: const Color(0xFF14171D),
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(14),
                   )
                   .alignment(Alignment.center),
                   
               const SizedBox(height: 32),
               
-              // Título Principal
               const Text('Regístrate')
-                  .textColor(const Color(0xFFFFFFFF))
+                  .textColor(AppColors.textPrimary)
                   .fontSize(28)
                   .fontWeight(FontWeight.bold)
                   .alignment(Alignment.center),
                   
               const SizedBox(height: 16),
               
-              // Subtítulo y Enlace de Login
               <Widget>[
                 const Text('¿Tienes una cuenta? ')
-                    .textColor(const Color(0xFFA8AEB8))
+                    .textColor(AppColors.textMuted)
                     .fontSize(16),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: const Text('Inicia Sesión')
-                      .textColor(const Color(0xFFA4BCFC))
+                      .textColor(AppColors.transfer)
                       .fontSize(16)
                       .fontWeight(FontWeight.bold),
                 ),
@@ -212,12 +165,11 @@ class _RegisterViewState extends State<RegisterView> {
               
               const SizedBox(height: 40),
               
-              // Campos de Formulario
               _buildTextField(
                 label: 'N° Cédula',
                 hint: '0912345678',
                 controller: _cedulaController,
-                validator: _validateCedula,
+                validator: Validators.validateCedula,
                 keyboardType: TextInputType.number,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -228,35 +180,34 @@ class _RegisterViewState extends State<RegisterView> {
                 label: 'Nombres',
                 hint: 'Pepe Tola',
                 controller: _namesController,
-                validator: _validateNames,
+                validator: Validators.validateNames,
               ),
               _buildTextField(
                 label: 'Correo electrónico',
                 hint: 'Loisbecket@gmail.com',
                 controller: _emailController,
-                validator: _validateEmail,
+                validator: Validators.validateEmail,
                 keyboardType: TextInputType.emailAddress,
               ),
               _buildTextField(
                 label: 'Contraseña',
                 hint: '********',
                 controller: _passwordController,
-                validator: _validatePassword,
+                validator: Validators.validatePassword,
                 isPassword: true,
               ),
               _buildTextField(
                 label: 'Confirmar Contraseña',
                 hint: '********',
                 controller: _confirmPasswordController,
-                validator: _validateConfirmPassword,
+                validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),
                 isConfirmPassword: true,
               ),
               
-              // Aceptar Términos
               <Widget>[
                 Theme(
                   data: ThemeData(
-                    unselectedWidgetColor: const Color(0xFFA8AEB8),
+                    unselectedWidgetColor: AppColors.textMuted,
                   ),
                   child: Checkbox(
                     value: _acceptTerms,
@@ -265,70 +216,88 @@ class _RegisterViewState extends State<RegisterView> {
                         _acceptTerms = value ?? false;
                       });
                     },
-                    checkColor: const Color(0xFF000000),
-                    activeColor: const Color(0xFFA4BCFC),
+                    checkColor: AppColors.background,
+                    activeColor: AppColors.transfer,
                     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                   ),
                 ),
                 const SizedBox(width: 8),
                 const Text('Acepto los Términos y Condiciones')
-                    .textColor(const Color(0xFFA8AEB8))
+                    .textColor(AppColors.textMuted)
                     .fontSize(14),
               ].toRow(),
               
               const SizedBox(height: 40),
               
-              // Botón Principal Registrar
-              ElevatedButton(
-                onPressed: _isLoading ? null : () {
-                  if (!_formKey.currentState!.validate()) {
-                    return;
-                  }
+              ListenableBuilder(
+                listenable: _viewModel,
+                builder: (context, _) {
+                  return ElevatedButton(
+                    onPressed: _viewModel.isLoading ? null : () async {
+                      if (!_formKey.currentState!.validate()) {
+                        return;
+                      }
 
-                  if (!_acceptTerms) {
-                    NotificationHelper.show(
-                      context,
-                      message: 'Debes aceptar los términos y condiciones',
-                      type: NotificationType.danger,
-                    );
-                    return;
-                  }
+                      if (!_acceptTerms) {
+                        NotificationHelper.show(
+                          context,
+                          message: 'Debes aceptar los términos y condiciones',
+                          type: NotificationType.danger,
+                        );
+                        return;
+                      }
 
-                  setState(() {
-                    _isLoading = true;
-                  });
+                      final success = await _viewModel.register(
+                        _cedulaController.text.trim(),
+                        _namesController.text.trim(),
+                        _emailController.text.trim(),
+                        _passwordController.text,
+                        _acceptTerms,
+                      );
 
-                  NotificationHelper.show(
-                    context,
-                    message: 'Se ha registrado el usuario correctamente',
-                    type: NotificationType.success,
-                  );
+                      if (context.mounted) {
+                        if (success) {
+                          NotificationHelper.show(
+                            context,
+                            message: 'Se ha registrado el usuario correctamente',
+                            type: NotificationType.success,
+                          );
 
-                  Future.delayed(const Duration(milliseconds: 2500), () {
-                    if (context.mounted) {
-                      Navigator.pop(context); 
-                    }
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFCFEAFF),
-                  foregroundColor: const Color(0xFF000000),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: _isLoading 
-                  ? const SizedBox(
-                      height: 24, 
-                      width: 24, 
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
-                    )
-                  : const Text('Registrar')
-                      .fontSize(16)
-                      .fontWeight(FontWeight.bold),
-              ).width(double.infinity),
+                          Future.delayed(const Duration(milliseconds: 2500), () {
+                            if (context.mounted) {
+                              Navigator.pop(context); 
+                            }
+                          });
+                        } else {
+                          NotificationHelper.show(
+                            context,
+                            message: _viewModel.errorMessage ?? 'Error desconocido',
+                            type: NotificationType.danger,
+                          );
+                        }
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.background,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: _viewModel.isLoading 
+                      ? const SizedBox(
+                          height: 24, 
+                          width: 24, 
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)
+                        )
+                      : const Text('Registrar')
+                          .fontSize(16)
+                          .fontWeight(FontWeight.bold),
+                  ).width(double.infinity);
+                }
+              ),
               
               const SizedBox(height: 40),
             ]

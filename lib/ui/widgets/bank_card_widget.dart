@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_assets.dart';
 
 class BankCardWidget extends StatefulWidget {
   final String cardName;
@@ -30,22 +32,22 @@ class _BankCardWidgetState extends State<BankCardWidget> {
       <Widget>[
         <Widget>[
           Text(widget.cardName)
-              .textColor(const Color(0xFFFFFFFF))
+              .textColor(AppColors.textPrimary)
               .fontSize(16)
               .fontWeight(FontWeight.bold),
           Text(widget.cardNumber)
-              .textColor(const Color(0xFFA8AEB8))
+              .textColor(AppColors.textMuted)
               .fontSize(14),
         ].toColumn(crossAxisAlignment: CrossAxisAlignment.start).expanded(),
         
         SvgPicture.asset(
-          'assets/logos/logo-prestige-trust-bank-small-icon.svg',
+          AppAssets.logoSmall,
           width: 24,
           height: 24,
         )
             .padding(all: 8)
             .decorated(
-              color: const Color(0xFF000000), // Contraste oscuro dentro de la tarjeta
+              color: AppColors.background,
               borderRadius: BorderRadius.circular(14),
             ),
       ].toRow(),
@@ -53,19 +55,19 @@ class _BankCardWidgetState extends State<BankCardWidget> {
       const SizedBox(height: 32),
       
       const Text('Saldo')
-          .textColor(const Color(0xFFA8AEB8))
+          .textColor(AppColors.textMuted)
           .fontSize(14),
       <Widget>[
         _obscureBalance
             ? ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
                 child: Text('\$$displayBalance')
-                    .textColor(const Color(0xFFFFFFFF))
+                    .textColor(AppColors.textPrimary)
                     .fontSize(24)
                     .fontWeight(FontWeight.bold),
               ).expanded()
             : Text('\$$displayBalance')
-                .textColor(const Color(0xFFFFFFFF))
+                .textColor(AppColors.textPrimary)
                 .fontSize(24)
                 .fontWeight(FontWeight.bold)
                 .expanded(),
@@ -73,7 +75,7 @@ class _BankCardWidgetState extends State<BankCardWidget> {
         IconButton(
           icon: Icon(
             _obscureBalance ? Icons.visibility_off : Icons.visibility,
-            color: const Color(0xFFA8AEB8),
+            color: AppColors.textMuted,
             size: 24,
           ),
           onPressed: () {
@@ -87,7 +89,7 @@ class _BankCardWidgetState extends State<BankCardWidget> {
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
         .padding(all: 24)
         .decorated(
-          color: const Color(0xFF14171D), // Nuevo fondo de superficie
+          color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             const BoxShadow(

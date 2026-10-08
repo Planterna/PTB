@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
-
-enum TransactionType { transfer, purchase, subscription, deposit }
+import '../../data/models/transaction_model.dart';
 
 class TransactionItemWidget extends StatelessWidget {
   final String name; 
