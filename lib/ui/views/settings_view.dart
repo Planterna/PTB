@@ -3,7 +3,7 @@ import 'package:styled_widget/styled_widget.dart';
 import 'login_view.dart';
 
 class SettingsView extends StatelessWidget {
-  const SettingsView({Key? key}) : super(key: key);
+  const SettingsView({super.key});
 
   Widget _buildSettingsButton(IconData icon, String title) {
     return <Widget>[

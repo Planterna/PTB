@@ -1,17 +1,19 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class BankCardWidget extends StatefulWidget {
-  final String cardName; // Ej: "Cuenta de ahorro", "Tarjeta de Crédito"
-  final String cardNumber; // Ej: "0123456789"
-  final double balance; // Ej: 1000.0
+  final String cardName;
+  final String cardNumber;
+  final double balance;
 
   const BankCardWidget({
-    Key? key,
+    super.key,
     required this.cardName,
     required this.cardNumber,
     required this.balance,
-  }) : super(key: key);
+  });
 
   @override
   State<BankCardWidget> createState() => _BankCardWidgetState();
@@ -22,47 +24,57 @@ class _BankCardWidgetState extends State<BankCardWidget> {
 
   @override
   Widget build(BuildContext context) {
-    // Formatear el saldo para mostrarlo (podrías usar intl para formato de moneda)
     final displayBalance = widget.balance.toStringAsFixed(2);
 
     return <Widget>[
-      // Parte superior de la tarjeta (Nombre y Número)
       <Widget>[
         <Widget>[
           Text(widget.cardName)
-              .textColor(Colors.white)
-              .fontSize(14)
-              .fontWeight(FontWeight.w500),
+              .textColor(const Color(0xFFFFFFFF))
+              .fontSize(16)
+              .fontWeight(FontWeight.bold),
           Text(widget.cardNumber)
-              .textColor(Colors.white)
+              .textColor(const Color(0xFFA8AEB8))
               .fontSize(14),
         ].toColumn(crossAxisAlignment: CrossAxisAlignment.start).expanded(),
         
-        // Icono / Logo del banco o tipo de tarjeta
-        const Icon(Icons.account_balance, color: Color(0xFFA5E6D8), size: 24)
-            .padding(all: 10)
+        SvgPicture.asset(
+          'assets/logos/logo-prestige-trust-bank-small-icon.svg',
+          width: 24,
+          height: 24,
+        )
+            .padding(all: 8)
             .decorated(
-              color: const Color(0xFF1E2228),
-              borderRadius: BorderRadius.circular(12),
+              color: const Color(0xFF000000), // Contraste oscuro dentro de la tarjeta
+              borderRadius: BorderRadius.circular(14),
             ),
       ].toRow(),
       
-      const SizedBox(height: 30),
+      const SizedBox(height: 32),
       
-      // Saldo y botón de ocultar
       const Text('Saldo')
-          .textColor(Colors.white)
+          .textColor(const Color(0xFFA8AEB8))
           .fontSize(14),
       <Widget>[
-        Text(_obscureBalance ? '****' : '\$$displayBalance')
-            .textColor(Colors.white)
-            .fontSize(32)
-            .fontWeight(FontWeight.bold)
-            .expanded(),
+        _obscureBalance
+            ? ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                child: Text('\$$displayBalance')
+                    .textColor(const Color(0xFFFFFFFF))
+                    .fontSize(24)
+                    .fontWeight(FontWeight.bold),
+              ).expanded()
+            : Text('\$$displayBalance')
+                .textColor(const Color(0xFFFFFFFF))
+                .fontSize(24)
+                .fontWeight(FontWeight.bold)
+                .expanded(),
+                
         IconButton(
           icon: Icon(
             _obscureBalance ? Icons.visibility_off : Icons.visibility,
-            color: Colors.white,
+            color: const Color(0xFFA8AEB8),
+            size: 24,
           ),
           onPressed: () {
             setState(() {
@@ -73,11 +85,17 @@ class _BankCardWidgetState extends State<BankCardWidget> {
       ].toRow(),
     ]
         .toColumn(crossAxisAlignment: CrossAxisAlignment.start)
-        .padding(all: 20)
+        .padding(all: 24)
         .decorated(
-          color: const Color(0xFF0F111A), // Fondo azul muy oscuro
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white10),
+          color: const Color(0xFF14171D), // Nuevo fondo de superficie
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            const BoxShadow(
+              color: Colors.black26,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            )
+          ],
         );
   }
 }
