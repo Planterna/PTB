@@ -6,16 +6,37 @@ class MockFinanceDataSource {
     'loisbecket@gmail.com': [
       CardModel(
         id: 'c1',
+        idCuenta: 'acc1',
         cardName: 'Prestige Visa',
         cardNumber: '**** 4022',
-        balance: 14500.50,
+        tipoTarjeta: 'debito',
       ),
       CardModel(
         id: 'c2',
-        cardName: 'Cuenta de Cheques',
+        idCuenta: 'acc1',
+        cardName: 'Prestige Mastercard',
         cardNumber: '**** 8831',
-        balance: 3200.75,
+        tipoTarjeta: 'credito',
       ),
+    ],
+  };
+
+  static final Map<String, List<dynamic>> _userAccounts = {
+    'loisbecket@gmail.com': [
+      {
+        'id_cuenta': 'acc1',
+        'id_usuario': 'u1',
+        'tipo_cuenta': 'ahorro',
+        'numero_cuenta': '**** 1122',
+        'saldo_cuenta': 25000.00,
+      },
+      {
+        'id_cuenta': 'acc2',
+        'id_usuario': 'u1',
+        'tipo_cuenta': 'corriente',
+        'numero_cuenta': '**** 3344',
+        'saldo_cuenta': 8500.25,
+      },
     ],
   };
 
@@ -54,18 +75,25 @@ class MockFinanceDataSource {
 
   Future<List<CardModel>> getCardsForUser(String userId) async {
     await Future.delayed(const Duration(milliseconds: 500));
-    return _userCards[userId] ?? [
-      CardModel(
-        id: 'default_card',
-        cardName: 'Cuenta Básica',
-        cardNumber: '**** 0000',
-        balance: 0.0,
-      )
-    ];
+    return _userCards[userId] ??
+        [
+          CardModel(
+            id: 'default_card',
+            idCuenta: 'default_acc',
+            cardName: 'Tarjeta Básica',
+            cardNumber: '**** 0000',
+            tipoTarjeta: "debito",
+          ),
+        ];
   }
 
   Future<List<TransactionModel>> getTransactionsForUser(String userId) async {
     await Future.delayed(const Duration(milliseconds: 500));
     return _userTransactions[userId] ?? [];
+  }
+
+  Future<List<dynamic>> getAccountsForUser(String userId) async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    return _userAccounts[userId] ?? [];
   }
 }

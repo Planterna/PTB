@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_colors.dart';
+
 import 'package:styled_widget/styled_widget.dart';
 import '../../data/models/transaction_model.dart';
 
@@ -19,13 +21,13 @@ class TransactionItemWidget extends StatelessWidget {
   Widget _getIconForType() {
     switch (type) {
       case TransactionType.transfer:
-        return const Icon(Icons.person, color: Color(0xFFA4BCFC), size: 24);
+        return const Icon(Icons.person, color: AppColors.primary, size: 24);
       case TransactionType.purchase:
-        return const Icon(Icons.shopping_bag, color: Color(0xFFCFEAFF), size: 24);
+        return const Icon(Icons.shopping_bag, color: AppColors.primary, size: 24);
       case TransactionType.subscription:
-        return const Icon(Icons.autorenew, color: Color(0xFFA8AEB8), size: 24);
+        return const Icon(Icons.autorenew, color: AppColors.textMuted, size: 24);
       case TransactionType.deposit:
-        return const Icon(Icons.account_balance_wallet, color: Color(0xFFA7DBCB), size: 24);
+        return const Icon(Icons.account_balance_wallet, color: AppColors.accent, size: 24);
     }
   }
 
@@ -35,19 +37,19 @@ class TransactionItemWidget extends StatelessWidget {
     final formattedValue = '\$${value.abs().toStringAsFixed(2)}';
     final displayAmount = isPositive ? '+$formattedValue' : '-$formattedValue';
 
-    final amountColor = isPositive ? const Color(0xFFA7DBCB) : const Color(0xFFFFFFFF);
+    final amountColor = isPositive ? AppColors.accent : AppColors.textPrimary;
 
     Widget transactionCard =
         <Widget>[
               _getIconForType()
                   .padding(all: 8)
                   .decorated(
-                    color: const Color(0xFF000000), 
+                    color: AppColors.background, 
                     borderRadius: BorderRadius.circular(14)
                   ),
               const SizedBox(width: 16),
               Text(name)
-                  .textColor(const Color(0xFFFFFFFF))
+                  .textColor(AppColors.textPrimary)
                   .fontSize(16)
                   .fontWeight(FontWeight.w500)
                   .expanded(),
@@ -59,11 +61,11 @@ class TransactionItemWidget extends StatelessWidget {
             .toRow()
             .padding(all: 16)
             .decorated(
-              color: const Color(0xFF14171D),
+              color: AppColors.surface,
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
-                const BoxShadow(
-                  color: Colors.black12,
+                BoxShadow(
+                  color: AppColors.background.withOpacity(0.12),
                   blurRadius: 4,
                   offset: Offset(0, 2),
                 )
@@ -74,7 +76,7 @@ class TransactionItemWidget extends StatelessWidget {
     if (date != null && date!.isNotEmpty) {
       return <Widget>[
         Text(date!)
-            .textColor(const Color(0xFFA8AEB8))
+            .textColor(AppColors.textMuted)
             .fontSize(14)
             .fontWeight(FontWeight.bold)
             .padding(bottom: 8, top: 8),

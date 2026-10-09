@@ -9,11 +9,12 @@ import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/utils/validators.dart';
 import '../viewmodels/login_viewmodel.dart';
-import '../../data/datasources/mock/mock_auth_datasource.dart';
+import '../../data/datasources/remote/remote_auth_datasource.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../widgets/custom_text_field.dart';
 
 class LoginView extends StatefulWidget {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   State<LoginView> createState() => _LoginViewState();
@@ -21,7 +22,6 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   bool _rememberMe = false;
-  bool _obscurePassword = true;
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -32,8 +32,8 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-    final mockDataSource = MockAuthDataSource();
-    final repository = AuthRepository(mockDataSource);
+    final remoteDataSource = RemoteAuthDataSource();
+    final repository = AuthRepository(remoteDataSource);
     _viewModel = LoginViewModel(repository);
   }
 
@@ -50,210 +50,186 @@ class _LoginViewState extends State<LoginView> {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: <Widget>[
-              const SizedBox(height: 80),
-
-              SvgPicture.asset(
-                AppAssets.logoSmall,
-                height: 48,
-                width: 48,
-              )
-                  .padding(all: 16)
-                  .decorated(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(14), 
-                  )
-                  .alignment(Alignment.center),
-
-              const SizedBox(height: 32),
-
-              const Text('Iniciar sesión')
-                  .textColor(AppColors.textPrimary)
-                  .fontSize(28)
-                  .fontWeight(FontWeight.bold)
-                  .alignment(Alignment.center),
-
-              const SizedBox(height: 16),
-
-              <Widget>[
-                const Text('¿No tienes una cuenta? ')
-                    .textColor(AppColors.textMuted)
-                    .fontSize(16),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const RegisterView(),
-                      ),
-                    );
-                  },
-                  child: const Text('Regístrate')
-                      .textColor(AppColors.transfer)
-                      .fontSize(16)
-                      .fontWeight(FontWeight.bold),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight - 32, // Ocupar pantalla completa si es posible
                 ),
-              ].toRow(mainAxisAlignment: MainAxisAlignment.center),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SvgPicture.asset(
+                        AppAssets.logoSmall,
+                        height: 48,
+                        width: 48,
+                      )
+                          .padding(all: 16)
+                          .decorated(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(14),
+                          )
+                          .alignment(Alignment.center),
 
-              const SizedBox(height: 40),
+                      const SizedBox(height: 32),
 
-              const Text('Correo electrónico')
-                  .textColor(AppColors.textMuted)
-                  .fontSize(14)
-                  .padding(bottom: 8),
+                      const Text('Iniciar sesión')
+                          .textColor(AppColors.textPrimary)
+                          .fontSize(28)
+                          .fontWeight(FontWeight.bold)
+                          .alignment(Alignment.center),
 
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                validator: Validators.validateEmail,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: 'ejemplo@correo.com',
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
+                      const SizedBox(height: 16),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text('¿No tienes una cuenta? ')
+                              .textColor(AppColors.textMuted)
+                              .fontSize(16),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterView(),
+                                ),
+                              );
+                            },
+                            child: const Text('Regístrate')
+                                .textColor(AppColors.primary)
+                                .fontSize(16)
+                                .fontWeight(FontWeight.bold),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      CustomTextField(
+                        label: 'Correo electrónico',
+                        hint: 'example@example.com',
+                        controller: _emailController,
+                        validator: Validators.validateEmail,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+
+                      CustomTextField(
+                        label: 'Contraseña',
+                        hint: '********',
+                        controller: _passwordController,
+                        validator: Validators.validatePassword,
+                        isPassword: true,
+                      ),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Theme(
+                                  data: ThemeData(
+                                    unselectedWidgetColor: AppColors.textMuted,
+                                  ),
+                                  child: Checkbox(
+                                    value: _rememberMe,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _rememberMe = value ?? false;
+                                      });
+                                    },
+                                    checkColor: AppColors.background,
+                                    activeColor: AppColors.primary,
+                                    materialTapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    visualDensity: const VisualDensity(
+                                      horizontal: -4,
+                                      vertical: -4,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('Recuérdame')
+                                    .textColor(AppColors.textMuted)
+                                    .fontSize(14),
+                              ],
+                            ),
+                          ),
+                          const Text('¿Olvidaste tu contraseña?')
+                              .textColor(AppColors.primary)
+                              .fontSize(14)
+                              .fontWeight(FontWeight.w500),
+                        ],
+                      ),
+
+                      const SizedBox(height: 40),
+
+                      ListenableBuilder(
+                        listenable: _viewModel,
+                        builder: (context, _) {
+                          return ElevatedButton(
+                            onPressed: _viewModel.isLoading
+                                ? null
+                                : () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      final success = await _viewModel.login(
+                                        _emailController.text.trim(),
+                                        _passwordController.text.trim(),
+                                      );
+
+                                      if (context.mounted) {
+                                        if (success) {
+                                          NotificationHelper.show(
+                                            context,
+                                            message:
+                                                'Bienvenido ${_viewModel.user?.name}',
+                                            type: NotificationType.success,
+                                          );
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => HomeView(
+                                                user: _viewModel.user!,
+                                              ),
+                                            ),
+                                          );
+                                        } else {
+                                          NotificationHelper.show(
+                                            context,
+                                            message:
+                                                _viewModel.errorMessage ??
+                                                'Error desconocido',
+                                            type: NotificationType.danger,
+                                          );
+                                        }
+                                      }
+                                    }
+                                  },
+                            child: _viewModel.isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.background,
+                                    ),
+                                  )
+                                : const Text('Ingresar'),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                  errorStyle: const TextStyle(color: AppColors.error),
                 ),
               ),
-
-              const SizedBox(height: 24),
-
-              const Text('Contraseña')
-                  .textColor(AppColors.textMuted)
-                  .fontSize(14)
-                  .padding(bottom: 8),
-
-              TextFormField(
-                controller: _passwordController,
-                validator: Validators.validatePassword,
-                obscureText: _obscurePassword,
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-                decoration: InputDecoration(
-                  hintText: '********',
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
-                  filled: true,
-                  fillColor: AppColors.surface,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
-                  ),
-                  errorStyle: const TextStyle(color: AppColors.error),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                      color: AppColors.textMuted,
-                      size: 24,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              <Widget>[
-                <Widget>[
-                  Theme(
-                    data: ThemeData(unselectedWidgetColor: AppColors.textMuted),
-                    child: Checkbox(
-                      value: _rememberMe,
-                      onChanged: (value) {
-                        setState(() {
-                          _rememberMe = value ?? false;
-                        });
-                      },
-                      checkColor: AppColors.background,
-                      activeColor: AppColors.transfer, 
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: const VisualDensity(
-                        horizontal: -4,
-                        vertical: -4,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text('Recuérdame')
-                      .textColor(AppColors.textMuted)
-                      .fontSize(14),
-                ].toRow().expanded(),
-
-                const Text('¿Olvidaste tu contraseña?')
-                    .textColor(AppColors.transfer)
-                    .fontSize(14)
-                    .fontWeight(FontWeight.w500),
-              ].toRow(),
-
-              const SizedBox(height: 40),
-
-              ListenableBuilder(
-                listenable: _viewModel,
-                builder: (context, _) {
-                  return ElevatedButton(
-                    onPressed: _viewModel.isLoading ? null : () async {
-                      if (_formKey.currentState!.validate()) {
-                        final success = await _viewModel.login(
-                          _emailController.text.trim(),
-                          _passwordController.text.trim(),
-                        );
-                        
-                        if (context.mounted) {
-                          if (success) {
-                            NotificationHelper.show(
-                              context, 
-                              message: 'Bienvenido ${_viewModel.user?.name}', 
-                              type: NotificationType.success
-                            );
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => HomeView(user: _viewModel.user!)),
-                            );
-                          } else {
-                            NotificationHelper.show(
-                              context, 
-                              message: _viewModel.errorMessage ?? 'Error desconocido', 
-                              type: NotificationType.danger
-                            );
-                          }
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.background,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: _viewModel.isLoading 
-                      ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                      : const Text('Ingresar')
-                          .fontSize(16)
-                          .fontWeight(FontWeight.bold),
-                  ).width(double.infinity);
-                }
-              ),
-            ].toColumn(crossAxisAlignment: CrossAxisAlignment.start).padding(horizontal: 24),
-          ),
+            );
+          },
         ),
       ),
     );

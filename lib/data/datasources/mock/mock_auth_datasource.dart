@@ -7,6 +7,7 @@ class MockAuthDataSource {
     'loisbecket@gmail.com': {
       'user': UserModel(
         id: '1',
+        cedula: '0123456789',
         name: 'Lois Becket',
         email: 'loisbecket@gmail.com',
       ),
@@ -41,6 +42,7 @@ class MockAuthDataSource {
     // Crear nuevo usuario
     final newUser = UserModel(
       id: idCard, // Usamos la cédula como ID simulado
+      cedula: idCard,
       name: name,
       email: email,
     );

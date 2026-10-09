@@ -35,7 +35,9 @@ class RegisterViewModel extends ChangeNotifier {
     notifyListeners(); // Inicia carga
 
     try {
-      _user = await _repository.register(idCard, name, email, password);
+      await _repository.register(idCard, name, email, password);
+      // Tras registrarse con éxito, intentamos hacer login para obtener el JWT y el usuario
+      _user = await _repository.login(email, password);
       _isLoading = false;
       notifyListeners();
       return true; // Registro exitoso

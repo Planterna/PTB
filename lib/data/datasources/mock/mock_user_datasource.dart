@@ -10,6 +10,7 @@ class MockUserDataSource {
       id: '1',
       name: 'Usuario Prueba',
       email: 'prueba@prestigetrustbank.com',
+      cedula: '1234567890',
     );
   }
 }
