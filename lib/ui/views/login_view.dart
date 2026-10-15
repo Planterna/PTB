@@ -49,83 +49,96 @@ class _LoginViewState extends State<LoginView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 32, // Ocupar pantalla completa si es posible
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      SvgPicture.asset(
-                        AppAssets.logoSmall,
-                        height: 48,
-                        width: 48,
-                      )
-                          .padding(all: 16)
-                          .decorated(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(14),
-                          )
-                          .alignment(Alignment.center),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.0, -0.6),
+            radius: 1.2,
+            colors: [
+              Color(0xFF121A27),
+              AppColors.background,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - 32, // Ocupar pantalla completa si es posible
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SvgPicture.asset(
+                          AppAssets.logoSmall,
+                          height: 48,
+                          width: 48,
+                        )
+                            .padding(all: 16)
+                            .decorated(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(14),
+                            )
+                            .alignment(Alignment.center),
 
-                      const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                      const Text('Iniciar sesión')
-                          .textColor(AppColors.textPrimary)
-                          .fontSize(28)
-                          .fontWeight(FontWeight.bold)
-                          .alignment(Alignment.center),
+                        const Text('Iniciar sesión')
+                            .textColor(AppColors.textPrimary)
+                            .fontSize(28)
+                            .fontWeight(FontWeight.bold)
+                            .alignment(Alignment.center),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('¿No tienes una cuenta? ')
-                              .textColor(AppColors.textMuted)
-                              .fontSize(16),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const RegisterView(),
-                                ),
-                              );
-                            },
-                            child: const Text('Regístrate')
-                                .textColor(AppColors.primary)
-                                .fontSize(16)
-                                .fontWeight(FontWeight.bold),
-                          ),
-                        ],
-                      ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('¿No tienes una cuenta? ')
+                                .textColor(AppColors.textMuted)
+                                .fontSize(16),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const RegisterView(),
+                                  ),
+                                );
+                              },
+                              child: const Text('Regístrate')
+                                  .textColor(AppColors.primary)
+                                  .fontSize(16)
+                                  .fontWeight(FontWeight.bold),
+                            ),
+                          ],
+                        ),
 
-                      const SizedBox(height: 40),
+                        const SizedBox(height: 40),
 
-                      CustomTextField(
-                        label: 'Correo electrónico',
-                        hint: 'example@example.com',
-                        controller: _emailController,
-                        validator: Validators.validateEmail,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
+                        CustomTextField(
+                          label: 'Correo electrónico',
+                          hint: 'example@example.com',
+                          controller: _emailController,
+                          validator: Validators.validateEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: Icons.email_outlined,
+                        ),
 
-                      CustomTextField(
-                        label: 'Contraseña',
-                        hint: '********',
-                        controller: _passwordController,
-                        validator: Validators.validatePassword,
-                        isPassword: true,
-                      ),
+                        CustomTextField(
+                          label: 'Contraseña',
+                          hint: '********',
+                          controller: _passwordController,
+                          validator: Validators.validatePassword,
+                          isPassword: true,
+                          prefixIcon: Icons.lock_outlined,
+                        ),
 
                       Row(
                         children: [
@@ -232,6 +245,7 @@ class _LoginViewState extends State<LoginView> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

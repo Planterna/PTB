@@ -10,6 +10,7 @@ class ApiConstants {
   static const String accounts = '/cuentas';
   static const String cards = '/tarjetas';
   static const String transactions = '/movimientos';
+  static const String profile = '/usuario/perfil';
 
   // Headers por defecto
   static const Map<String, String> defaultHeaders = {

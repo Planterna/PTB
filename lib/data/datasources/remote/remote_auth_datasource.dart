@@ -31,14 +31,21 @@ class RemoteAuthDataSource {
         final body = json.decode(response.body);
         final token = body['token'] as String;
 
-        // Guardar el token en SharedPreferences
+        // Guardar el token y datos del usuario en SharedPreferences
         final prefs = await SharedPreferences.getInstance();
+        final userId = body['user']?['id'] ?? '0';
+        final userCedula = body['user']?['cedula'] ?? '';
+        final userName = body['user']?['nombres'] ?? 'Usuario';
         await prefs.setString('jwt_token', token);
+        await prefs.setString('user_id', userId);
+        await prefs.setString('user_cedula', userCedula);
+        await prefs.setString('user_name', userName);
+        await prefs.setString('user_email', email);
 
         return UserModel(
-          id: body['user']?['id'] ?? '0',
-          cedula: body['user']?['cedula'] ?? '',
-          name: body['user']?['nombres'] ?? 'Usuario',
+          id: userId,
+          cedula: userCedula,
+          name: userName,
           email: email,
         );
       } else {
@@ -89,6 +96,10 @@ class RemoteAuthDataSource {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token');
+    await prefs.remove('user_id');
+    await prefs.remove('user_cedula');
+    await prefs.remove('user_name');
+    await prefs.remove('user_email');
   }
 
   Future<String?> getToken() async {

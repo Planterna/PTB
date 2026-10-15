@@ -54,104 +54,157 @@ class _RegisterViewState extends State<RegisterView> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: constraints.maxHeight - 32,
-                ),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 16),
-                      SvgPicture.asset(
-                        AppAssets.logoSmall,
-                        height: 48,
-                        width: 48,
-                      )
-                          .padding(all: 16)
-                          .decorated(
-                            color: AppColors.surface,
-                            borderRadius: BorderRadius.circular(14),
-                          )
-                          .alignment(Alignment.center),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: RadialGradient(
+            center: Alignment(0.0, -0.6),
+            radius: 1.2,
+            colors: [
+              Color(0xFF121A27),
+              AppColors.background,
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - 32,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const SizedBox(height: 16),
+                        SvgPicture.asset(
+                          AppAssets.logoSmall,
+                          height: 48,
+                          width: 48,
+                        )
+                            .padding(all: 16)
+                            .decorated(
+                              color: AppColors.surface,
+                              borderRadius: BorderRadius.circular(14),
+                            )
+                            .alignment(Alignment.center),
 
-                      const SizedBox(height: 32),
+                        const SizedBox(height: 32),
 
-                      const Text('Regístrate')
-                          .textColor(AppColors.textPrimary)
-                          .fontSize(28)
-                          .fontWeight(FontWeight.bold)
-                          .alignment(Alignment.center),
+                        const Text('Regístrate')
+                            .textColor(AppColors.textPrimary)
+                            .fontSize(28)
+                            .fontWeight(FontWeight.bold)
+                            .alignment(Alignment.center),
 
-                      const SizedBox(height: 16),
+                        const SizedBox(height: 16),
 
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text('¿Tienes una cuenta? ')
-                              .textColor(AppColors.textMuted)
-                              .fontSize(16),
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: const Text('Inicia Sesión')
-                                .textColor(AppColors.primary)
-                                .fontSize(16)
-                                .fontWeight(FontWeight.bold),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      CustomTextField(
-                        label: 'N° Cédula',
-                        hint: '0999999999',
-                        controller: _cedulaController,
-                        validator: Validators.validateCedula,
-                        keyboardType: TextInputType.number,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                          LengthLimitingTextInputFormatter(10),
-                        ],
-                      ),
-                      CustomTextField(
-                        label: 'Nombres',
-                        hint: 'Juan Marcelo',
-                        controller: _namesController,
-                        validator: Validators.validateNames,
-                      ),
-                      CustomTextField(
-                        label: 'Correo electrónico',
-                        hint: 'example@example.com',
-                        controller: _emailController,
-                        validator: Validators.validateEmail,
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      CustomTextField(
-                        label: 'Contraseña',
-                        hint: '********',
-                        controller: _passwordController,
-                        validator: Validators.validatePassword,
-                        isPassword: true,
-                      ),
-                      CustomTextField(
-                        label: 'Confirmar Contraseña',
-                        hint: '********',
-                        controller: _confirmPasswordController,
-                        validator: (value) =>
-                            Validators.validateConfirmPassword(
-                              value,
-                              _passwordController.text,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text('¿Tienes una cuenta? ')
+                                .textColor(AppColors.textMuted)
+                                .fontSize(16),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: const Text('Inicia Sesión')
+                                  .textColor(AppColors.primary)
+                                  .fontSize(16)
+                                  .fontWeight(FontWeight.bold),
                             ),
-                        isPassword: true,
-                      ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 32),
+
+                        // Sección 1: Datos Personales
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.badge_outlined,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('1. Datos Personales')
+                                .textColor(AppColors.primary)
+                                .fontSize(15)
+                                .fontWeight(FontWeight.bold),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        CustomTextField(
+                          label: 'N° Cédula',
+                          hint: '0999999999',
+                          controller: _cedulaController,
+                          validator: Validators.validateCedula,
+                          keyboardType: TextInputType.number,
+                          prefixIcon: Icons.badge_outlined,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
+                          ],
+                        ),
+                        CustomTextField(
+                          label: 'Nombres',
+                          hint: 'Juan Marcelo',
+                          controller: _namesController,
+                          validator: Validators.validateNames,
+                          prefixIcon: Icons.person_outline,
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Sección 2: Credenciales de Acceso
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.lock_outline,
+                              color: AppColors.primary,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text('2. Credenciales de Acceso')
+                                .textColor(AppColors.primary)
+                                .fontSize(15)
+                                .fontWeight(FontWeight.bold),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+
+                        CustomTextField(
+                          label: 'Correo electrónico',
+                          hint: 'example@example.com',
+                          controller: _emailController,
+                          validator: Validators.validateEmail,
+                          keyboardType: TextInputType.emailAddress,
+                          prefixIcon: Icons.email_outlined,
+                        ),
+                        CustomTextField(
+                          label: 'Contraseña',
+                          hint: '********',
+                          controller: _passwordController,
+                          validator: Validators.validatePassword,
+                          isPassword: true,
+                          prefixIcon: Icons.lock_outlined,
+                        ),
+                        CustomTextField(
+                          label: 'Confirmar Contraseña',
+                          hint: '********',
+                          controller: _confirmPasswordController,
+                          validator: (value) =>
+                              Validators.validateConfirmPassword(
+                                value,
+                                _passwordController.text,
+                              ),
+                          isPassword: true,
+                          prefixIcon: Icons.lock_clock_outlined,
+                        ),
 
                       Row(
                         children: [
@@ -262,6 +315,7 @@ class _RegisterViewState extends State<RegisterView> {
           },
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

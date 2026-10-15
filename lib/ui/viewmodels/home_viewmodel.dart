@@ -41,8 +41,10 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  HomeViewModel({required FinanceRepository repository, required this.userId})
-    : _repository = repository {
+  HomeViewModel({
+    required this._repository,
+    required this.userId,
+  }) {
     loadData();
   }
 

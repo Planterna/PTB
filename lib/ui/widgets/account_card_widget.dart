@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/theme/app_theme.dart';
 import '../../core/constants/app_assets.dart';
 import '../../data/models/account_model.dart';
 
@@ -33,7 +34,7 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
         : [AppColors.softAccent, AppColors.accent]; // Degradado verdoso
 
     final textColor = AppColors.textDark;
-    final mutedColor = AppColors.textDark.withOpacity(0.6);
+    final mutedColor = AppColors.textDark.withValues(alpha: 0.6);
 
     return <Widget>[
       <Widget>[
@@ -55,7 +56,7 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
         )
             .padding(all: 8)
             .decorated(
-              color: AppColors.background.withOpacity(0.1),
+              color: AppColors.background.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
       ].toRow(),
@@ -69,16 +70,15 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
         _obscureBalance
             ? ImageFiltered(
                 imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Text('\$$displayBalance')
-                    .textColor(textColor)
-                    .fontSize(24)
-                    .fontWeight(FontWeight.bold),
-              ).expanded()
-            : Text('\$$displayBalance')
-                .textColor(textColor)
-                .fontSize(24)
-                .fontWeight(FontWeight.bold)
-                .expanded(),
+                child: Text(
+                  '\$$displayBalance',
+                  style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+                ).expanded(),
+              )
+            : Text(
+                '\$$displayBalance',
+                style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+              ).expanded(),
                 
         IconButton(
           icon: Icon(
@@ -105,7 +105,7 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: AppColors.background.withOpacity(0.26),
+              color: AppColors.background.withValues(alpha: 0.26),
               blurRadius: 8,
               offset: const Offset(0, 4),
             )

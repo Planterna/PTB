@@ -28,7 +28,7 @@ class BankCardWidget extends StatelessWidget {
         : [const Color(0xFF2C3E50), const Color(0xFF141E30)]; // Azul oscuro profundo
 
     final textColor = isCredit ? AppColors.background : AppColors.textPrimary;
-    final mutedTextColor = textColor.withOpacity(0.70);
+    final mutedTextColor = textColor.withValues(alpha: 0.70);
 
     return <Widget>[
       // Fila Superior: Nombre del banco / Chip
@@ -51,8 +51,8 @@ class BankCardWidget extends StatelessWidget {
         )
             .padding(all: 8)
             .decorated(
-              color: textColor.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(12),
+              color: textColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(14),
             ),
       ].toRow(),
       
@@ -80,10 +80,10 @@ class BankCardWidget extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: AppColors.background.withOpacity(0.45),
+              color: AppColors.background.withValues(alpha: 0.45),
               blurRadius: 12,
               offset: const Offset(0, 6),
             )

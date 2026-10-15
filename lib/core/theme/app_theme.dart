@@ -3,6 +3,25 @@ import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
 class AppTheme {
+  static const double cardRadius = 14.0;
+  static const double buttonRadius = 14.0;
+  static BorderRadius get cardBorderRadius => BorderRadius.circular(cardRadius);
+  static BorderRadius get buttonBorderRadius => BorderRadius.circular(buttonRadius);
+
+  static TextStyle amountStyle({
+    double fontSize = 24,
+    Color color = AppColors.textPrimary,
+    FontWeight fontWeight = FontWeight.bold,
+  }) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: fontWeight,
+      fontFeatures: const [FontFeature.tabularFigures()],
+      letterSpacing: 0.5,
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       scaffoldBackgroundColor: AppColors.background,

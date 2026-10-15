@@ -1,17 +1,24 @@
-import '../datasources/mock/mock_user_datasource.dart';
+import '../datasources/remote/remote_user_datasource.dart';
 import '../models/user_model.dart';
 
 class UserRepository {
-  // Por ahora dependemos del datasource de Mock
-  final MockUserDataSource _mockDataSource;
+  final RemoteUserDataSource _remoteDataSource;
 
-  // En el futuro, aquí inyectarás también tu RemoteDataSource (conexión a API MySQL)
-  UserRepository(this._mockDataSource);
+  UserRepository(this._remoteDataSource);
 
   Future<UserModel> getUserProfile() async {
-    // Cuando conectes el backend, solo cambiarás esta línea para
-    // usar tu remoteDataSource en lugar del mock. 
-    // ¡El resto de tu app no notará el cambio!
-    return await _mockDataSource.getUserProfile();
+    return await _remoteDataSource.getUserProfile();
+  }
+
+  Future<UserModel> updateUserProfile({
+    required String id,
+    required String name,
+    required String email,
+  }) async {
+    return await _remoteDataSource.updateUserProfile(
+      id: id,
+      name: name,
+      email: email,
+    );
   }
 }

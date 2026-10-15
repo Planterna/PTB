@@ -13,4 +13,8 @@ class AuthRepository {
   Future<void> register(String idCard, String name, String email, String password) async {
     return await _remoteDataSource.register(idCard, name, email, password);
   }
+
+  Future<void> logout() async {
+    return await _remoteDataSource.logout();
+  }
 }

@@ -44,7 +44,7 @@ class NotificationHelper {
           .padding(all: 16)
           .decorated(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),
