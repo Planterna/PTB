@@ -67,18 +67,25 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
           .textColor(mutedColor)
           .fontSize(14),
       <Widget>[
-        _obscureBalance
-            ? ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Text(
-                  '\$$displayBalance',
-                  style: AppTheme.amountStyle(fontSize: 26, color: textColor),
-                ).expanded(),
-              )
-            : Text(
-                '\$$displayBalance',
-                style: AppTheme.amountStyle(fontSize: 26, color: textColor),
-              ).expanded(),
+        (_obscureBalance
+                ? ClipRect(
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                        sigmaX: 8,
+                        sigmaY: 8,
+                        tileMode: TileMode.decal,
+                      ),
+                      child: Text(
+                        '\$$displayBalance',
+                        style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+                      ),
+                    ),
+                  )
+                : Text(
+                    '\$$displayBalance',
+                    style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+                  ))
+            .expanded(),
                 
         IconButton(
           icon: Icon(

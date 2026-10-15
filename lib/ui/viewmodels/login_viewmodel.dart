@@ -10,15 +10,23 @@ class LoginViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _rememberMe = false;
+  bool get rememberMe => _rememberMe;
+
+  void toggleRememberMe(bool? value) {
+    _rememberMe = value ?? false;
+    notifyListeners();
+  }
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
   UserModel? _user;
   UserModel? get user => _user;
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String username, String password) async {
     // Validación básica de UI
-    if (email.isEmpty || password.isEmpty) {
+    if (username.isEmpty || password.isEmpty) {
       _errorMessage = 'Por favor, llena todos los campos';
       notifyListeners();
       return false;
@@ -29,7 +37,7 @@ class LoginViewModel extends ChangeNotifier {
     notifyListeners(); // Avisa a la vista que inicie la animación de carga
 
     try {
-      _user = await _repository.login(email, password);
+      _user = await _repository.login(username, password);
       _isLoading = false;
       notifyListeners();
       return true; // Login exitoso

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:styled_widget/styled_widget.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../core/helpers/notification_helper.dart';
 import '../../core/utils/validators.dart';
@@ -23,7 +26,6 @@ class SettingsView extends StatefulWidget {
 
 class _SettingsViewState extends State<SettingsView> {
   late ProfileViewModel _viewModel;
-  bool _showPersonalData = true;
 
   @override
   void initState() {
@@ -58,7 +60,9 @@ class _SettingsViewState extends State<SettingsView> {
           builder: (dialogSetStateContext, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
               title: const Row(
                 children: [
                   Icon(Icons.edit_note, color: AppColors.primary, size: 24),
@@ -81,7 +85,10 @@ class _SettingsViewState extends State<SettingsView> {
                     children: [
                       const Text(
                         'Modifica tus datos de contacto para mantener tu cuenta actualizada.',
-                        style: TextStyle(color: AppColors.textMuted, fontSize: 13),
+                        style: TextStyle(
+                          color: AppColors.textMuted,
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 16),
                       CustomTextField(
@@ -90,6 +97,11 @@ class _SettingsViewState extends State<SettingsView> {
                         controller: nameController,
                         validator: Validators.validateNames,
                         prefixIcon: Icons.person_outline,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]'),
+                          ),
+                        ],
                       ),
                       CustomTextField(
                         label: 'Correo Electrónico',
@@ -134,7 +146,8 @@ class _SettingsViewState extends State<SettingsView> {
                               } else {
                                 NotificationHelper.show(
                                   context,
-                                  message: _viewModel.errorMessage ??
+                                  message:
+                                      _viewModel.errorMessage ??
                                       'Error al actualizar los datos',
                                   type: NotificationType.danger,
                                 );
@@ -169,24 +182,15 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   Widget _buildSectionHeader(String title, IconData icon) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 20.0, bottom: 12.0),
-      child: Row(
-        children: [
-          Icon(icon, color: AppColors.primary, size: 18),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ),
-    );
+    return <Widget>[
+      Icon(icon, color: AppColors.primary, size: 18),
+      const SizedBox(width: 8),
+      Text(title)
+          .textColor(AppColors.primary)
+          .fontSize(15)
+          .bold()
+          .letterSpacing(0.5),
+    ].toRow().padding(top: 20.0, bottom: 12.0);
   }
 
   Widget _buildOptionTile({
@@ -196,76 +200,52 @@ class _SettingsViewState extends State<SettingsView> {
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceLight,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      leading: Icon(icon, color: AppColors.accent, size: 20)
+          .padding(all: 8)
+          .decorated(
             color: AppColors.surface,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: AppColors.accent, size: 20),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: AppColors.textPrimary,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        subtitle: subtitle != null
-            ? Text(
-                subtitle,
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
-              )
-            : null,
-        trailing: trailing ??
-            (onTap != null
-                ? const Icon(Icons.arrow_forward_ios, color: AppColors.textMuted, size: 14)
-                : null),
-        onTap: onTap,
-      ),
-    );
+      title: Text(title)
+          .textColor(AppColors.textPrimary)
+          .fontSize(15)
+          .fontWeight(FontWeight.w500),
+      subtitle: subtitle != null
+          ? Text(subtitle).textColor(AppColors.textMuted).fontSize(12)
+          : null,
+      trailing: trailing ??
+          (onTap != null
+              ? const Icon(
+                  Icons.arrow_forward_ios,
+                  color: AppColors.textMuted,
+                  size: 14,
+                )
+              : null),
+      onTap: onTap,
+    )
+        .decorated(
+          color: AppColors.surfaceLight,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+        )
+        .padding(bottom: 12);
   }
 
   Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+    return <Widget>[
+      Text(label)
+          .textColor(AppColors.textMuted)
+          .fontSize(13)
+          .fontWeight(FontWeight.w600)
+          .constrained(width: 70),
+      Text(value)
+          .textColor(AppColors.textPrimary)
+          .fontSize(14)
+          .fontWeight(FontWeight.w500)
+          .expanded(),
+    ].toRow(crossAxisAlignment: CrossAxisAlignment.start).padding(bottom: 10.0);
   }
 
   @override
@@ -323,50 +303,44 @@ class _SettingsViewState extends State<SettingsView> {
                 const SizedBox(height: 16),
 
                 // Nombre del usuario dinámico
-                Text(
-                  currentUser.name,
-                  style: const TextStyle(
-                    color: AppColors.textPrimary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Text(currentUser.name)
+                    .textColor(AppColors.textPrimary)
+                    .fontSize(22)
+                    .bold()
+                    .textAlignment(TextAlign.center),
+
+                if (currentUser.username != null && currentUser.username!.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text('@${currentUser.username}')
+                      .textColor(AppColors.primary)
+                      .fontSize(14)
+                      .fontWeight(FontWeight.w600)
+                      .textAlignment(TextAlign.center),
+                ],
 
                 const SizedBox(height: 4),
 
-                Text(
-                  currentUser.email,
-                  style: const TextStyle(
-                    color: AppColors.textMuted,
-                    fontSize: 14,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+                Text(currentUser.email)
+                    .textColor(AppColors.textMuted)
+                    .fontSize(14)
+                    .textAlignment(TextAlign.center),
 
                 const SizedBox(height: 8),
 
                 // Badge Cédula
-                Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
+                Text('C.I. ${currentUser.cedula.isNotEmpty ? currentUser.cedula : "No registrada"}')
+                    .textColor(AppColors.accent)
+                    .fontSize(12)
+                    .bold()
+                    .padding(horizontal: 10, vertical: 4)
+                    .decorated(
                       color: AppColors.surface,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: AppColors.accent.withValues(alpha: 0.3),
                       ),
-                    ),
-                    child: Text(
-                      'C.I. ${currentUser.cedula.isNotEmpty ? currentUser.cedula : "No registrada"}',
-                      style: const TextStyle(
-                        color: AppColors.accent,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+                    )
+                    .alignment(Alignment.center),
 
                 const SizedBox(height: 16),
 
@@ -380,17 +354,15 @@ class _SettingsViewState extends State<SettingsView> {
                   title: 'Información Personal',
                   subtitle: 'Consulta y edita tus datos básicos',
                   trailing: Icon(
-                    _showPersonalData ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    _viewModel.showPersonalData
+                        ? Icons.keyboard_arrow_up
+                        : Icons.keyboard_arrow_down,
                     color: AppColors.accent,
                   ),
-                  onTap: () {
-                    setState(() {
-                      _showPersonalData = !_showPersonalData;
-                    });
-                  },
+                  onTap: _viewModel.togglePersonalData,
                 ),
 
-                if (_showPersonalData)
+                if (_viewModel.showPersonalData)
                   GlassContainer(
                     borderRadius: BorderRadius.circular(14),
                     padding: const EdgeInsets.all(16),
@@ -399,6 +371,8 @@ class _SettingsViewState extends State<SettingsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildDetailRow('Nombre:', currentUser.name),
+                        if (currentUser.username != null && currentUser.username!.isNotEmpty)
+                          _buildDetailRow('Usuario:', '@${currentUser.username}'),
                         _buildDetailRow(
                           'Cédula:',
                           currentUser.cedula.isNotEmpty
@@ -411,7 +385,11 @@ class _SettingsViewState extends State<SettingsView> {
                           alignment: Alignment.centerRight,
                           child: TextButton.icon(
                             onPressed: _showEditProfileDialog,
-                            icon: const Icon(Icons.edit, size: 16, color: AppColors.primary),
+                            icon: const Icon(
+                              Icons.edit,
+                              size: 16,
+                              color: AppColors.primary,
+                            ),
                             label: const Text(
                               'Editar Datos',
                               style: TextStyle(
@@ -468,7 +446,8 @@ class _SettingsViewState extends State<SettingsView> {
                   onTap: () {
                     NotificationHelper.show(
                       context,
-                      message: 'Esta opción requiere confirmación por SMS o correo',
+                      message:
+                          'Esta opción requiere confirmación por SMS o correo',
                       type: NotificationType.alert,
                     );
                   },
@@ -486,12 +465,11 @@ class _SettingsViewState extends State<SettingsView> {
                     );
                   },
                 ),
+                SizedBox(height: 10),
 
                 // ============================================
                 // CATEGORÍA 3: CERRAR SESIÓN
                 // ============================================
-                _buildSectionHeader('CERRAR SESIÓN', Icons.logout),
-
                 ElevatedButton.icon(
                   onPressed: () {
                     showDialog(
@@ -564,7 +542,7 @@ class _SettingsViewState extends State<SettingsView> {
                 // Versión actual
                 const Center(
                   child: Text(
-                    'Prestige Trust Bank • v1.0.0 (MVP)',
+                    'Prestige Trust Bank • v2.0.0',
                     style: TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 12,

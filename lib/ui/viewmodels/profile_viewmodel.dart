@@ -16,6 +16,14 @@ class ProfileViewModel extends ChangeNotifier {
   bool _isSaving = false;
   bool get isSaving => _isSaving;
 
+  bool _showPersonalData = true;
+  bool get showPersonalData => _showPersonalData;
+
+  void togglePersonalData() {
+    _showPersonalData = !_showPersonalData;
+    notifyListeners();
+  }
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 

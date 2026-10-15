@@ -20,11 +20,11 @@ class RegisterView extends StatefulWidget {
 }
 
 class _RegisterViewState extends State<RegisterView> {
-  bool _acceptTerms = false;
 
   final _formKey = GlobalKey<FormState>();
   final _cedulaController = TextEditingController();
   final _namesController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -43,6 +43,7 @@ class _RegisterViewState extends State<RegisterView> {
   void dispose() {
     _cedulaController.dispose();
     _namesController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -59,52 +60,80 @@ class _RegisterViewState extends State<RegisterView> {
           gradient: RadialGradient(
             center: Alignment(0.0, -0.6),
             radius: 1.2,
-            colors: [
-              Color(0xFF121A27),
-              AppColors.background,
-            ],
+            colors: [Color(0xFF121A27), AppColors.background],
           ),
         ),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+              final screenHeight = constraints.maxHeight;
+
+              // Dimensiones responsivas para el icono y espaciado
+              final double iconSize = isKeyboardOpen
+                  ? 42.0
+                  : (screenHeight * 0.085).clamp(52.0, 76.0);
+              final double iconPadding = (iconSize * 0.22).clamp(10.0, 16.0);
+              final double topSpacing = isKeyboardOpen ? 6.0 : (screenHeight * 0.02).clamp(8.0, 22.0);
+              final double bottomSpacing = isKeyboardOpen ? 12.0 : (screenHeight * 0.03).clamp(14.0, 28.0);
+              final double borderRadius = (iconPadding + 4.0).clamp(12.0, 18.0);
+
               return SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - 32,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 500,
+                      minHeight: constraints.maxHeight - 32,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(height: topSpacing),
+                          Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOutCubic,
+                              padding: EdgeInsets.all(iconPadding),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(borderRadius),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: SvgPicture.asset(
+                                AppAssets.logoSymbol,
+                                height: iconSize,
+                                width: iconSize,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(height: bottomSpacing),
+
+                          const Text('Regístrate')
+                              .textColor(AppColors.textPrimary)
+                              .fontSize(28)
+                              .fontWeight(FontWeight.bold)
+                              .alignment(Alignment.center),
+
                         const SizedBox(height: 16),
-                        SvgPicture.asset(
-                          AppAssets.logoSmall,
-                          height: 48,
-                          width: 48,
-                        )
-                            .padding(all: 16)
-                            .decorated(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(14),
-                            )
-                            .alignment(Alignment.center),
 
-                        const SizedBox(height: 32),
-
-                        const Text('Regístrate')
-                            .textColor(AppColors.textPrimary)
-                            .fontSize(28)
-                            .fontWeight(FontWeight.bold)
-                            .alignment(Alignment.center),
-
-                        const SizedBox(height: 16),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             const Text('¿Tienes una cuenta? ')
                                 .textColor(AppColors.textMuted)
@@ -122,20 +151,18 @@ class _RegisterViewState extends State<RegisterView> {
                         const SizedBox(height: 32),
 
                         // Sección 1: Datos Personales
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.badge_outlined,
-                              color: AppColors.primary,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text('1. Datos Personales')
-                                .textColor(AppColors.primary)
-                                .fontSize(15)
-                                .fontWeight(FontWeight.bold),
-                          ],
-                        ),
+                        <Widget>[
+                          const Icon(
+                            Icons.badge_outlined,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text('1. Datos Personales')
+                              .textColor(AppColors.primary)
+                              .fontSize(15)
+                              .fontWeight(FontWeight.bold),
+                        ].toRow(),
                         const SizedBox(height: 16),
 
                         CustomTextField(
@@ -155,27 +182,46 @@ class _RegisterViewState extends State<RegisterView> {
                           hint: 'Juan Marcelo',
                           controller: _namesController,
                           validator: Validators.validateNames,
+                          keyboardType: TextInputType.name,
                           prefixIcon: Icons.person_outline,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]'),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 16),
 
                         // Sección 2: Credenciales de Acceso
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.lock_outline,
-                              color: AppColors.primary,
-                              size: 18,
+                        <Widget>[
+                          const Icon(
+                            Icons.lock_outline,
+                            color: AppColors.primary,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text('2. Credenciales de Acceso')
+                              .textColor(AppColors.primary)
+                              .fontSize(15)
+                              .fontWeight(FontWeight.bold),
+                        ].toRow(),
+                        const SizedBox(height: 16),
+
+                        CustomTextField(
+                          label: 'Usuario',
+                          hint: 'ej. juan_marcelo-99',
+                          controller: _usernameController,
+                          validator: Validators.validateUsername,
+                          keyboardType: TextInputType.text,
+                          prefixIcon: Icons.alternate_email,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(
+                              RegExp(r'[a-zA-Z0-9_\-]'),
                             ),
-                            const SizedBox(width: 8),
-                            const Text('2. Credenciales de Acceso')
-                                .textColor(AppColors.primary)
-                                .fontSize(15)
-                                .fontWeight(FontWeight.bold),
+                            LengthLimitingTextInputFormatter(25),
                           ],
                         ),
-                        const SizedBox(height: 16),
 
                         CustomTextField(
                           label: 'Correo electrónico',
@@ -206,116 +252,109 @@ class _RegisterViewState extends State<RegisterView> {
                           prefixIcon: Icons.lock_clock_outlined,
                         ),
 
-                      Row(
-                        children: [
-                          Theme(
-                            data: ThemeData(
-                              unselectedWidgetColor: AppColors.textMuted,
-                            ),
-                            child: Checkbox(
-                              value: _acceptTerms,
-                              onChanged: (value) {
-                                setState(() {
-                                  _acceptTerms = value ?? false;
-                                });
-                              },
-                              checkColor: AppColors.background,
-                              activeColor: AppColors.primary,
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              visualDensity: const VisualDensity(
-                                horizontal: -4,
-                                vertical: -4,
+                        ListenableBuilder(
+                          listenable: _viewModel,
+                          builder: (context, _) => Row(
+                            children: [
+                              Theme(
+                                data: ThemeData(
+                                  unselectedWidgetColor: AppColors.textMuted,
+                                ),
+                                child: Checkbox(
+                                  value: _viewModel.acceptTerms,
+                                  onChanged: _viewModel.toggleAcceptTerms,
+                                  checkColor: AppColors.background,
+                                  activeColor: AppColors.primary,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                  visualDensity: const VisualDensity(
+                                    horizontal: -4,
+                                    vertical: -4,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 8),
+                              const Text('Acepto los Términos y Condiciones')
+                                  .textColor(AppColors.textMuted)
+                                  .fontSize(14)
+                                  .expanded(),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          const Text('Acepto los Términos y Condiciones')
-                              .textColor(AppColors.textMuted)
-                              .fontSize(14),
-                        ],
-                      ),
+                        ),
 
-                      const SizedBox(height: 40),
+                        const SizedBox(height: 40),
 
-                      ListenableBuilder(
-                        listenable: _viewModel,
-                        builder: (context, _) {
-                          return ElevatedButton(
-                            onPressed: _viewModel.isLoading
-                                ? null
-                                : () async {
-                                    if (!_formKey.currentState!.validate()) {
-                                      return;
-                                    }
-
-                                    if (!_acceptTerms) {
-                                      NotificationHelper.show(
-                                        context,
-                                        message: 'Debes aceptar los términos y condiciones',
-                                        type: NotificationType.danger,
-                                      );
-                                      return;
-                                    }
-
-                                    final success = await _viewModel.register(
-                                      _cedulaController.text.trim(),
-                                      _namesController.text.trim(),
-                                      _emailController.text.trim(),
-                                      _passwordController.text,
-                                      _acceptTerms,
-                                    );
-
-                                    if (context.mounted) {
-                                      if (success) {
-                                        NotificationHelper.show(
-                                          context,
-                                          message: 'Se ha registrado el usuario correctamente',
-                                          type: NotificationType.success,
-                                        );
-
-                                        Future.delayed(
-                                          const Duration(milliseconds: 2500),
-                                          () {
-                                            if (context.mounted) {
-                                              Navigator.pop(context);
-                                            }
-                                          },
-                                        );
-                                      } else {
-                                        NotificationHelper.show(
-                                          context,
-                                          message:
-                                              _viewModel.errorMessage ??
-                                              'Error desconocido',
-                                          type: NotificationType.danger,
-                                        );
+                        ListenableBuilder(
+                          listenable: _viewModel,
+                          builder: (context, _) {
+                            return ElevatedButton(
+                              onPressed: _viewModel.isLoading
+                                  ? null
+                                  : () async {
+                                      if (!_formKey.currentState!.validate()) {
+                                        return;
                                       }
-                                    }
-                                  },
-                            child: _viewModel.isLoading
-                                ? const SizedBox(
-                                    height: 24,
-                                    width: 24,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: AppColors.background,
-                                    ),
-                                  )
-                                : const Text('Registrar'),
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+
+                                      final success = await _viewModel.register(
+                                        _cedulaController.text.trim(),
+                                        _namesController.text.trim(),
+                                        _emailController.text.trim(),
+                                        _passwordController.text,
+                                        _viewModel.acceptTerms,
+                                        username: _usernameController.text.trim(),
+                                      );
+
+                                      if (context.mounted) {
+                                        if (success) {
+                                          NotificationHelper.show(
+                                            context,
+                                            message: 'Se ha registrado el usuario correctamente',
+                                            type: NotificationType.success,
+                                          );
+
+                                          Future.delayed(
+                                            const Duration(milliseconds: 2500),
+                                            () {
+                                              if (context.mounted) {
+                                                Navigator.pop(context);
+                                              }
+                                            },
+                                          );
+                                        } else {
+                                          NotificationHelper.show(
+                                            context,
+                                            message:
+                                                _viewModel.errorMessage ??
+                                                'Error desconocido',
+                                            type: NotificationType.danger,
+                                          );
+                                        }
+                                      }
+                                    },
+                              child: _viewModel.isLoading
+                                  ? const SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.background,
+                                      ),
+                                    )
+                                  : const Text('Registrar'),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
             );
           },
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

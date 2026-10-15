@@ -1,54 +1,50 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/network/api_client.dart';
 import '../../models/user_model.dart';
 
 class RemoteUserDataSource {
-  Future<String?> _getToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('jwt_token');
-  }
+  final ApiClient _apiClient;
+
+  RemoteUserDataSource({ApiClient? apiClient})
+      : _apiClient = apiClient ?? ApiClient();
 
   Future<UserModel> getUserProfile() async {
     final prefs = await SharedPreferences.getInstance();
     final cachedId = prefs.getString('user_id') ?? '';
     final cachedCedula = prefs.getString('user_cedula') ?? '';
     final cachedName = prefs.getString('user_name') ?? 'Usuario';
+    final cachedUsername = prefs.getString('user_username') ?? '';
     final cachedEmail = prefs.getString('user_email') ?? '';
 
-    final token = await _getToken();
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.profile}');
-
     try {
-      final response = await http.get(
-        url,
-        headers: {
-          ...ApiConstants.defaultHeaders,
-          'Authorization': 'Bearer $token',
-        },
-      );
+      final dynamic body = await _apiClient.get(ApiConstants.profile);
 
-      if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        final userData = body['user'] ?? body;
+      if (body != null) {
+        final userData = (body is Map<String, dynamic> && body['user'] is Map)
+            ? body['user'] as Map<String, dynamic>
+            : (body is Map<String, dynamic> ? body : <String, dynamic>{});
+
         final updatedUser = UserModel(
           id: userData['id']?.toString() ?? userData['id_usuario']?.toString() ?? cachedId,
-          cedula: userData['cedula'] ?? userData['cedula_usuario'] ?? cachedCedula,
-          name: userData['name'] ?? userData['nombres'] ?? userData['nombres_usuario'] ?? cachedName,
-          email: userData['email'] ?? userData['email_usuario'] ?? cachedEmail,
+          cedula: userData['cedula']?.toString() ?? userData['cedula_usuario']?.toString() ?? cachedCedula,
+          name: userData['name']?.toString() ?? userData['nombres']?.toString() ?? userData['nombres_usuario']?.toString() ?? cachedName,
+          email: userData['email']?.toString() ?? userData['email_usuario']?.toString() ?? cachedEmail,
+          username: userData['usuario']?.toString() ?? userData['username']?.toString() ?? cachedUsername,
         );
 
         await prefs.setString('user_id', updatedUser.id);
         await prefs.setString('user_cedula', updatedUser.cedula);
         await prefs.setString('user_name', updatedUser.name);
         await prefs.setString('user_email', updatedUser.email);
+        if (updatedUser.username != null) {
+          await prefs.setString('user_username', updatedUser.username!);
+        }
 
         return updatedUser;
       }
     } catch (_) {
-      // Si la API remota no responde o el endpoint está pendiente,
-      // se utiliza la información persistida en la sesión activa real
+      // Fallback a los datos de sesión local
     }
 
     return UserModel(
@@ -56,6 +52,7 @@ class RemoteUserDataSource {
       cedula: cachedCedula,
       name: cachedName,
       email: cachedEmail,
+      username: cachedUsername,
     );
   }
 
@@ -65,30 +62,27 @@ class RemoteUserDataSource {
     required String email,
   }) async {
     final prefs = await SharedPreferences.getInstance();
-    final token = await _getToken();
-    final url = Uri.parse('${ApiConstants.baseUrl}${ApiConstants.profile}');
 
     try {
-      final response = await http.put(
-        url,
-        headers: {
-          ...ApiConstants.defaultHeaders,
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode({
+      final dynamic body = await _apiClient.put(
+        ApiConstants.profile,
+        body: {
           'nombres': name,
           'email': email,
-        }),
+        },
       );
 
-      if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        final userData = body['user'] ?? body;
+      if (body != null) {
+        final userData = (body is Map<String, dynamic> && body['user'] is Map)
+            ? body['user'] as Map<String, dynamic>
+            : (body is Map<String, dynamic> ? body : <String, dynamic>{});
+
         final updated = UserModel(
           id: userData['id']?.toString() ?? userData['id_usuario']?.toString() ?? id,
-          cedula: userData['cedula'] ?? userData['cedula_usuario'] ?? (prefs.getString('user_cedula') ?? ''),
-          name: userData['name'] ?? userData['nombres'] ?? userData['nombres_usuario'] ?? name,
-          email: userData['email'] ?? userData['email_usuario'] ?? email,
+          cedula: userData['cedula']?.toString() ?? userData['cedula_usuario']?.toString() ?? (prefs.getString('user_cedula') ?? ''),
+          name: userData['name']?.toString() ?? userData['nombres']?.toString() ?? userData['nombres_usuario']?.toString() ?? name,
+          email: userData['email']?.toString() ?? userData['email_usuario']?.toString() ?? email,
+          username: userData['usuario']?.toString() ?? userData['username']?.toString() ?? prefs.getString('user_username'),
         );
 
         await prefs.setString('user_name', updated.name);
@@ -96,7 +90,7 @@ class RemoteUserDataSource {
         return updated;
       }
     } catch (_) {
-      // Fallback a persistencia local si no hay conectividad con el endpoint
+      // Fallback a persistencia local
     }
 
     await prefs.setString('user_name', name);
@@ -107,6 +101,7 @@ class RemoteUserDataSource {
       cedula: prefs.getString('user_cedula') ?? '',
       name: name,
       email: email,
+      username: prefs.getString('user_username'),
     );
   }
 }

@@ -4,23 +4,34 @@ class MockAuthDataSource {
   // Simulamos una base de datos en memoria para guardar los usuarios registrados
   static final Map<String, Map<String, dynamic>> _mockDatabase = {
     // Usuario por defecto para pruebas rápidas
+    'lois_becket': {
+      'user': UserModel(
+        id: '1',
+        cedula: '0123456789',
+        name: 'Lois Becket',
+        email: 'loisbecket@gmail.com',
+        username: 'lois_becket',
+      ),
+      'password': 'password123',
+    },
     'loisbecket@gmail.com': {
       'user': UserModel(
         id: '1',
         cedula: '0123456789',
         name: 'Lois Becket',
         email: 'loisbecket@gmail.com',
+        username: 'lois_becket',
       ),
       'password': 'password123',
     }
   };
 
-  Future<UserModel> login(String email, String password) async {
+  Future<UserModel> login(String username, String password) async {
     // Simular retardo de red
     await Future.delayed(const Duration(seconds: 2));
 
-    if (_mockDatabase.containsKey(email)) {
-      final record = _mockDatabase[email]!;
+    if (_mockDatabase.containsKey(username)) {
+      final record = _mockDatabase[username]!;
       if (record['password'] == password) {
         return record['user'] as UserModel;
       } else {
@@ -31,12 +42,18 @@ class MockAuthDataSource {
     }
   }
 
-  Future<UserModel> register(String idCard, String name, String email, String password) async {
+  Future<UserModel> register(
+    String idCard,
+    String name,
+    String email,
+    String password, {
+    String? username,
+  }) async {
     // Simular retardo de red
     await Future.delayed(const Duration(seconds: 2));
 
-    if (_mockDatabase.containsKey(email)) {
-      throw Exception('El correo electrónico ya está registrado');
+    if (_mockDatabase.containsKey(email) || (username != null && _mockDatabase.containsKey(username))) {
+      throw Exception('El usuario o correo electrónico ya está registrado');
     }
 
     // Crear nuevo usuario
@@ -45,6 +62,7 @@ class MockAuthDataSource {
       cedula: idCard,
       name: name,
       email: email,
+      username: username,
     );
 
     // Guardar en la "base de datos"
@@ -52,6 +70,12 @@ class MockAuthDataSource {
       'user': newUser,
       'password': password,
     };
+    if (username != null && username.isNotEmpty) {
+      _mockDatabase[username] = {
+        'user': newUser,
+        'password': password,
+      };
+    }
 
     return newUser;
   }

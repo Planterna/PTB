@@ -2,6 +2,8 @@ import '../datasources/remote/remote_finance_datasource.dart';
 import '../models/card_model.dart';
 import '../models/transaction_model.dart';
 import '../models/account_model.dart';
+import '../models/verified_account_model.dart';
+import '../models/transfer_result_model.dart';
 
 class FinanceRepository {
   final RemoteFinanceDataSource _remoteDataSource;
@@ -39,6 +41,24 @@ class FinanceRepository {
     return _remoteDataSource.createAccount(
       tipoCuenta: tipoCuenta,
       saldoCuenta: saldoCuenta,
+    );
+  }
+
+  Future<VerifiedAccount> validateAccount(String accountNumber) {
+    return _remoteDataSource.validateAccount(accountNumber);
+  }
+
+  Future<TransferResult> transfer({
+    required String cuentaOrigen,
+    required String cuentaDestino,
+    required double monto,
+    String? descripcion,
+  }) {
+    return _remoteDataSource.transfer(
+      cuentaOrigen: cuentaOrigen,
+      cuentaDestino: cuentaDestino,
+      monto: monto,
+      descripcion: descripcion,
     );
   }
 }

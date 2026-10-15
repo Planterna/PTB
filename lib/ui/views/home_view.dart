@@ -48,44 +48,28 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _buildEmptyState({required String title, required String subtitle}) {
     return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40.0, horizontal: 24.0),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.surface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.receipt_long_outlined,
-                size: 36,
-                color: AppColors.textMuted,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Text(
-              title,
-              style: const TextStyle(
-                color: AppColors.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              subtitle,
-              style: const TextStyle(
-                color: AppColors.textMuted,
-                fontSize: 13,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
+      child: <Widget>[
+        const Icon(
+          Icons.receipt_long_outlined,
+          size: 36,
+          color: AppColors.textMuted,
+        )
+            .padding(all: 16)
+            .decorated(color: AppColors.surface, shape: BoxShape.circle),
+        const SizedBox(height: 14),
+        Text(title)
+            .textColor(AppColors.textPrimary)
+            .fontSize(16)
+            .bold()
+            .textAlignment(TextAlign.center),
+        const SizedBox(height: 6),
+        Text(subtitle)
+            .textColor(AppColors.textMuted)
+            .fontSize(13)
+            .textAlignment(TextAlign.center),
+      ]
+          .toColumn()
+          .padding(vertical: 40.0, horizontal: 24.0),
     );
   }
 
@@ -242,7 +226,7 @@ class _HomeViewState extends State<HomeView> {
                       const SizedBox(height: 16),
 
                       // Botón para crear cuenta corriente (Oculto si ya tiene una)
-                      if (!_viewModel.accounts.any((acc) => acc.tipoCuenta == 'corriente'))
+                      if (!_viewModel.hasCheckingAccount)
                         Center(
                           child: ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
@@ -295,16 +279,11 @@ class _HomeViewState extends State<HomeView> {
                       // Sección Movimientos Recientes con Filtro Desplegable
                       Row(
                         children: [
-                          const Expanded(
-                            child: Text(
-                              'Movimientos Recientes',
-                              style: TextStyle(
-                                color: AppColors.textPrimary,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
+                          const Text('Movimientos Recientes')
+                              .textColor(AppColors.textPrimary)
+                              .fontSize(20)
+                              .bold()
+                              .expanded(),
 
                           // Menú desplegable para el filtro con efecto vidrio esmerilado
                           GlassContainer(

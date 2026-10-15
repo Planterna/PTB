@@ -21,6 +21,8 @@ class HomeViewModel extends ChangeNotifier {
   List<AccountModel> _accounts = [];
   List<AccountModel> get accounts => _accounts;
 
+  bool get hasCheckingAccount => _accounts.any((acc) => acc.tipoCuenta == 'corriente');
+
   List<TransactionModel> _transactions = [];
   List<TransactionModel> get transactions => _transactions;
 
