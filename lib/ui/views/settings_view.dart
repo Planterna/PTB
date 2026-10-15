@@ -200,37 +200,41 @@ class _SettingsViewState extends State<SettingsView> {
     VoidCallback? onTap,
     Widget? trailing,
   }) {
-    return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      leading: Icon(icon, color: AppColors.accent, size: 20)
-          .padding(all: 8)
-          .decorated(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(10),
-          ),
-      title: Text(title)
-          .textColor(AppColors.textPrimary)
-          .fontSize(15)
-          .fontWeight(FontWeight.w500),
-      subtitle: subtitle != null
-          ? Text(subtitle).textColor(AppColors.textMuted).fontSize(12)
-          : null,
-      trailing: trailing ??
-          (onTap != null
-              ? const Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.textMuted,
-                  size: 14,
-                )
-              : null),
-      onTap: onTap,
-    )
-        .decorated(
-          color: AppColors.surfaceLight,
+    return Material(
+      color: AppColors.surfaceLight,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
-        )
-        .padding(bottom: 12);
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: Icon(icon, color: AppColors.accent, size: 20)
+              .padding(all: 8)
+              .decorated(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(10),
+              ),
+          title: Text(title)
+              .textColor(AppColors.textPrimary)
+              .fontSize(15)
+              .fontWeight(FontWeight.w500),
+          subtitle: subtitle != null
+              ? Text(subtitle).textColor(AppColors.textMuted).fontSize(12)
+              : null,
+          trailing: trailing ??
+              (onTap != null
+                  ? const Icon(
+                      Icons.arrow_forward_ios,
+                      color: AppColors.textMuted,
+                      size: 14,
+                    )
+                  : null),
+          onTap: onTap,
+        ),
+      ),
+    ).padding(bottom: 12);
   }
 
   Widget _buildDetailRow(String label, String value) {
