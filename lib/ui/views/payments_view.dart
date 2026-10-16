@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import '../../core/constants/app_colors.dart';
@@ -131,71 +132,309 @@ class _PaymentsViewState extends State<PaymentsView> {
     final account = _paymentsViewModel.verifiedAccount;
     if (account == null) return;
 
+    final result = _paymentsViewModel.lastTransferResult;
+    final isInterbank = !_paymentsViewModel.isSameBank;
+    final fee = result?.comision ?? (isInterbank ? PaymentsViewModel.interbankFee : 0.0);
+    final totalDebited = result?.totalDebitado ?? (amount + fee);
+    final bankName = result?.bancoDestino ?? account.bankName;
+    final now = result?.fecha ?? DateTime.now();
+    final originAccountNum = widget.viewModel.accounts.isNotEmpty &&
+            _paymentsViewModel.selectedOriginIndex < widget.viewModel.accounts.length
+        ? widget.viewModel.accounts[_paymentsViewModel.selectedOriginIndex].numeroCuenta
+        : '';
+
+    final shareText = '''
+╔══════════════════════════════════════╗
+       PRESTIGE TRUST BANK
+   COMPROBANTE DE TRANSFERENCIA
+╚══════════════════════════════════════╝
+
+ESTADO: EXITOSA
+REFERENCIA: $ref
+FECHA: ${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}
+
+MONTO ENVIADO: \$${amount.toStringAsFixed(2)}
+COMISIÓN: \$${fee.toStringAsFixed(2)}${isInterbank ? ' (Interbancaria)' : ''}
+TOTAL DEBITADO: \$${totalDebited.toStringAsFixed(2)}
+
+--- DATOS DE LA TRANSFERENCIA ---
+Beneficiario: ${account.ownerName}
+Identificación: ${account.identification}
+Banco Destino: $bankName
+Cuenta Destino: ${account.accountNumber}
+Cuenta Origen: $originAccountNum
+Motivo: $concept
+
+Gracias por confiar en Prestige Trust Bank.
+''';
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
-        return AlertDialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-          content: <Widget>[
-            const Icon(Icons.check, color: AppColors.accent, size: 36)
-                .padding(all: 12)
-                .decorated(
-                  color: AppColors.accent.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.1),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 30,
+                  offset: const Offset(0, 10),
                 ),
-            const SizedBox(height: 12),
-            const Text('Transferencia Exitosa')
-                .textColor(AppColors.textPrimary)
-                .fontSize(18)
-                .bold(),
-            const SizedBox(height: 4),
-            Text('Ref: $ref')
-                .textColor(AppColors.textMuted)
-                .fontSize(12),
-            const SizedBox(height: 16),
-            Text(
-              '\$${amount.toStringAsFixed(2)}',
-              style: AppTheme.amountStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: AppColors.accent,
+              ],
+            ),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Ícono de éxito con halo moderno
+                  Container(
+                    width: 64,
+                    height: 64,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.accent.withValues(alpha: 0.25),
+                          AppColors.primary.withValues(alpha: 0.1),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(
+                        color: AppColors.accent.withValues(alpha: 0.4),
+                        width: 2,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.accent,
+                      size: 38,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+
+                  const Text(
+                    '¡Transferencia Exitosa!',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    isInterbank
+                        ? 'Transferencia Interbancaria Acreditada'
+                        : 'Transferencia Directa Prestige Trust Bank',
+                    style: const TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  // Monto destacado y desglose
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceLight,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.05),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Monto Enviado',
+                          style: TextStyle(
+                            color: AppColors.textMuted,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '\$${amount.toStringAsFixed(2)}',
+                          style: AppTheme.amountStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        if (isInterbank) ...[
+                          const SizedBox(height: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.softAccent.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.receipt_long,
+                                  size: 13,
+                                  color: AppColors.softAccent,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Comisión: \$0.45 • Total Debitado: \$${totalDebited.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    color: AppColors.textPrimary,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Tarjeta tipo comprobante / recibo
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceLight.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.06),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        _receiptRow('Beneficiario', account.ownerName, isBold: true),
+                        _receiptRow('Identificación', account.identification),
+                        _receiptRow('Banco Destino', bankName),
+                        _receiptRow('Cuenta Destino', account.accountNumber),
+                        if (originAccountNum.isNotEmpty)
+                          _receiptRow('Cuenta Origen', originAccountNum),
+                        _receiptRow('Motivo', concept),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Divider(color: Colors.white12, height: 1),
+                        ),
+                        _receiptRow(
+                          'Comisión',
+                          isInterbank ? '\$${fee.toStringAsFixed(2)}' : 'Gratis (\$0.00)',
+                        ),
+                        _receiptRow(
+                          'Total debitado',
+                          '\$${totalDebited.toStringAsFixed(2)}',
+                          isBold: true,
+                          highlightColor: AppColors.primary,
+                        ),
+                        _receiptRow(
+                          'Fecha y hora',
+                          '${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}',
+                        ),
+                        _receiptRow('Referencia', ref, isCopyable: true),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+
+                  // BOTÓN 1 (ARRIBA): COMPARTIR COMPROBANTE
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.background,
+                      minimumSize: const Size.fromHeight(48),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () async {
+                      // Copiar al portapapeles
+                      await Clipboard.setData(ClipboardData(text: shareText));
+                      if (ctx.mounted) {
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          const SnackBar(
+                            content: Text('Comprobante copiado al portapapeles'),
+                            backgroundColor: AppColors.accent,
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                      // Compartir nativamente con el sistema operativo
+                      try {
+                        await Share.share(
+                          shareText,
+                          subject: 'Comprobante de Transferencia PTB - $ref',
+                        );
+                      } catch (e) {
+                        debugPrint('Error al compartir comprobante: $e');
+                      }
+                    },
+                    icon: const Icon(Icons.share_outlined, size: 20),
+                    label: const Text(
+                      'Compartir Comprobante',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // BOTÓN 2 (ABAJO): REALIZAR OTRA TRANSFERENCIA
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      minimumSize: const Size.fromHeight(46),
+                      side: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _paymentsViewModel.resetFlow();
+                      _accountController.clear();
+                      _amountController.clear();
+                      _conceptController.clear();
+                    },
+                    icon: const Icon(Icons.replay_rounded, size: 18),
+                    label: const Text(
+                      'Realizar otra transferencia',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
-            <Widget>[
-              _receiptRow('Beneficiario', account.ownerName, isBold: true),
-              _receiptRow('Banco', account.bankName),
-              _receiptRow('Cuenta', account.accountNumber),
-              _receiptRow('Motivo', concept),
-            ]
-                .toColumn()
-                .padding(all: 12)
-                .decorated(
-                  color: AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-          ].toColumn(mainAxisSize: MainAxisSize.min),
-          actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.background,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () {
-                Navigator.pop(ctx);
-                _paymentsViewModel.resetFlow();
-                _accountController.clear();
-                _amountController.clear();
-                _conceptController.clear();
-              },
-              child: const Text('Realizar otra transferencia'),
-            ),
-          ],
+          ),
         );
       },
     );
@@ -207,20 +446,71 @@ class _PaymentsViewState extends State<PaymentsView> {
     );
   }
 
-  Widget _receiptRow(String label, String value, {bool isBold = false}) {
-    return <Widget>[
-      Text(label).textColor(AppColors.textMuted).fontSize(11),
-      const SizedBox(width: 8),
-      Text(
-        value,
-        overflow: TextOverflow.ellipsis,
-      )
-          .textColor(AppColors.textPrimary)
-          .fontSize(12)
-          .fontWeight(isBold ? FontWeight.bold : FontWeight.w500)
-          .textAlignment(TextAlign.right)
-          .flexible(),
-    ].toRow(mainAxisAlignment: MainAxisAlignment.spaceBetween).padding(vertical: 2.5);
+  Widget _receiptRow(
+    String label,
+    String value, {
+    bool isBold = false,
+    Color? highlightColor,
+    bool isCopyable = false,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3.5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textMuted,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Flexible(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    value,
+                    style: TextStyle(
+                      color: highlightColor ??
+                          (isBold
+                              ? AppColors.textPrimary
+                              : AppColors.textPrimary.withValues(alpha: 0.85)),
+                      fontSize: 12.5,
+                      fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.right,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isCopyable) ...[
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: value));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('$label copiado al portapapeles'),
+                          duration: const Duration(seconds: 1),
+                          backgroundColor: AppColors.accent,
+                        ),
+                      );
+                    },
+                    child: const Icon(
+                      Icons.copy_rounded,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -638,6 +928,72 @@ class _PaymentsViewState extends State<PaymentsView> {
           prefixIcon: Icons.edit_note,
         ),
       ),
+
+      if (!_paymentsViewModel.isSameBank) ...[
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.softAccent.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: AppColors.softAccent.withValues(alpha: 0.3),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.info_outline,
+                color: AppColors.accent,
+                size: 20,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: const [
+                    Text(
+                      'Comisión interbancaria: \$0.45',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Tarifa estándar regulada para envíos a otros bancos.',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.3),
+                  ),
+                ),
+                child: const Text(
+                  '+\$0.45',
+                  style: TextStyle(
+                    color: AppColors.accent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
 
       const SizedBox(height: 24),
 

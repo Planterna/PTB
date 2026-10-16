@@ -103,8 +103,8 @@ class PaymentsViewModel extends ChangeNotifier {
     final acc = inputNumber.trim();
     _accountNumber = acc;
 
-    if (acc.length != 10) {
-      _accountError = 'El número debe tener exactamente 10 dígitos.';
+    if (acc.length != 10 || !RegExp(r'^\d{10}$').hasMatch(acc)) {
+      _accountError = 'El número debe tener exactamente 10 dígitos numéricos.';
       _verifiedAccount = null;
       notifyListeners();
       return false;
@@ -119,24 +119,18 @@ class PaymentsViewModel extends ChangeNotifier {
         // Consultar al backend real (/api/cuentas/validar)
         final account = await _repository.validateAccount(acc);
         _verifiedAccount = account;
-        _isVerifying = false;
-        _accountError = null;
-        notifyListeners();
-        return true;
       } else {
-        // Para transferencias interbancarias
-        _verifiedAccount = VerifiedAccount(
-          accountNumber: acc,
-          ownerName: 'Titular Interbancario #${acc.substring(6)}',
-          identification: '17${acc.substring(2)}',
-          bankName: _selectedOtherBank,
-          accountType: _selectedAccountType,
+        // Consultar al backend real (/api/cuentas/validar-interbancaria)
+        final account = await _repository.validateInterbankAccount(
+          acc,
+          bank: _selectedOtherBank,
         );
-        _isVerifying = false;
-        _accountError = null;
-        notifyListeners();
-        return true;
+        _verifiedAccount = account;
       }
+      _isVerifying = false;
+      _accountError = null;
+      notifyListeners();
+      return true;
     } catch (e) {
       _isVerifying = false;
       _accountError = e.toString().replaceAll('Exception: ', '');
@@ -161,15 +155,23 @@ class PaymentsViewModel extends ChangeNotifier {
     return await verifyAccount(number);
   }
 
+  static const double interbankFee = 0.45;
+  double get currentFee => _isSameBank ? 0.0 : interbankFee;
+
   String? validatePaymentAmount(double? amount, List<AccountModel> accounts) {
     if (amount == null || amount <= 0) {
       return 'Ingresa un monto válido mayor a \$0.00';
     }
 
+    final totalRequired = amount + currentFee;
     if (accounts.isNotEmpty && _selectedOriginIndex < accounts.length) {
       final origin = accounts[_selectedOriginIndex];
-      if (amount > origin.saldoCuenta) {
-        return 'Saldo insuficiente en tu cuenta de origen';
+      if (totalRequired > origin.saldoCuenta) {
+        if (_isSameBank) {
+          return 'Saldo insuficiente en tu cuenta de origen';
+        } else {
+          return 'Saldo insuficiente. Requiere \$${amount.toStringAsFixed(2)} + \$${interbankFee.toStringAsFixed(2)} comisión = \$${totalRequired.toStringAsFixed(2)}. Saldo: \$${origin.saldoCuenta.toStringAsFixed(2)}';
+        }
       }
     }
     return null;
@@ -191,12 +193,23 @@ class PaymentsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final result = await _repository.transfer(
-        cuentaOrigen: cuentaOrigen,
-        cuentaDestino: _verifiedAccount!.accountNumber,
-        monto: monto,
-        descripcion: descripcion,
-      );
+      final TransferResult result;
+      if (_isSameBank) {
+        result = await _repository.transfer(
+          cuentaOrigen: cuentaOrigen,
+          cuentaDestino: _verifiedAccount!.accountNumber,
+          monto: monto,
+          descripcion: descripcion,
+        );
+      } else {
+        result = await _repository.transferInterbank(
+          cuentaOrigen: cuentaOrigen,
+          cuentaDestino: _verifiedAccount!.accountNumber,
+          banco: _verifiedAccount!.bankName,
+          monto: monto,
+          descripcion: descripcion,
+        );
+      }
 
       _lastTransferResult = result;
       _isProcessing = false;

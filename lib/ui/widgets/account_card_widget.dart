@@ -25,7 +25,7 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
   @override
   Widget build(BuildContext context) {
     final displayBalance = widget.account.saldoCuenta.toStringAsFixed(2);
-    final isAhorro = widget.account.tipoCuenta == 'ahorro';
+    final isAhorro = widget.account.tipoCuenta.toLowerCase().contains('ahorro');
     final accountTypeLabel = isAhorro ? 'Cuenta de Ahorros' : 'Cuenta Corriente';
 
     // Degradados dinámicos

@@ -29,8 +29,13 @@ class ApiConstants {
   static const String register = '/auth/register';
   static const String login = '/auth/login';
   static const String accounts = '/cuentas';
+  static const String currentAccount = '/cuentas/corriente';
+  static const String currentAccountRequests = '/cuentas/solicitudes-corriente';
   static const String validateAccount = '/cuentas/validar';
+  static const String validateInterbankAccount = '/cuentas/validar-interbancaria';
   static const String transfer = '/cuentas/transferir';
+  static const String transferInterbank = '/cuentas/transferir-interbancaria';
+  static const String banks = '/cuentas/bancos';
   static const String cards = '/tarjetas';
   static const String transactions = '/movimientos';
   static const String profile = '/usuario/perfil';

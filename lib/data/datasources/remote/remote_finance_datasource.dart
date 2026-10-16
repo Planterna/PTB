@@ -5,6 +5,7 @@ import '../../models/transaction_model.dart';
 import '../../models/account_model.dart';
 import '../../models/verified_account_model.dart';
 import '../../models/transfer_result_model.dart';
+import '../../models/current_account_request_model.dart';
 
 class RemoteFinanceDataSource {
   final ApiClient _apiClient;
@@ -86,6 +87,20 @@ class RemoteFinanceDataSource {
     );
   }
 
+  Future<CurrentAccountResponseModel> createCurrentAccount(
+    CurrentAccountRequestModel request,
+  ) async {
+    final dynamic data = await _apiClient.post(
+      ApiConstants.currentAccount,
+      body: request.toJson(),
+    );
+
+    if (data is Map<String, dynamic>) {
+      return CurrentAccountResponseModel.fromJson(data);
+    }
+    throw Exception('Respuesta inválida al procesar la solicitud de cuenta corriente');
+  }
+
   Future<VerifiedAccount> validateAccount(String accountNumber) async {
     final dynamic data = await _apiClient.post(
       ApiConstants.validateAccount,
@@ -96,6 +111,24 @@ class RemoteFinanceDataSource {
       return VerifiedAccount.fromJson(data);
     }
     throw Exception('Respuesta inválida al validar cuenta');
+  }
+
+  Future<VerifiedAccount> validateInterbankAccount(
+    String accountNumber, {
+    String? bank,
+  }) async {
+    final dynamic data = await _apiClient.post(
+      ApiConstants.validateInterbankAccount,
+      body: {
+        'numero_cuenta': accountNumber.trim(),
+        if (bank != null && bank.isNotEmpty) 'banco': bank.trim(),
+      },
+    );
+
+    if (data is Map<String, dynamic>) {
+      return VerifiedAccount.fromJson(data);
+    }
+    throw Exception('Respuesta inválida al validar cuenta interbancaria');
   }
 
   Future<TransferResult> transfer({
@@ -119,6 +152,31 @@ class RemoteFinanceDataSource {
       return TransferResult.fromJson(data);
     }
     throw Exception('Respuesta inválida al procesar la transferencia');
+  }
+
+  Future<TransferResult> transferInterbank({
+    required String cuentaOrigen,
+    required String cuentaDestino,
+    required double monto,
+    String? banco,
+    String? descripcion,
+  }) async {
+    final dynamic data = await _apiClient.post(
+      ApiConstants.transferInterbank,
+      body: {
+        'cuenta_origen': cuentaOrigen.trim(),
+        'numero_cuenta_destino': cuentaDestino.trim(),
+        'monto': monto,
+        if (banco != null && banco.isNotEmpty) 'nombre_banco': banco.trim(),
+        if (descripcion != null && descripcion.isNotEmpty)
+          'descripcion': descripcion.trim(),
+      },
+    );
+
+    if (data is Map<String, dynamic>) {
+      return TransferResult.fromJson(data);
+    }
+    throw Exception('Respuesta inválida al procesar la transferencia interbancaria');
   }
 
   String _formatDate(String? isoString) {

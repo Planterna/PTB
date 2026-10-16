@@ -7,6 +7,7 @@ import '../../data/repositories/finance_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final FinanceRepository _repository;
+  FinanceRepository get repository => _repository;
   final String userId;
 
   bool _isLoading = true;
@@ -21,7 +22,8 @@ class HomeViewModel extends ChangeNotifier {
   List<AccountModel> _accounts = [];
   List<AccountModel> get accounts => _accounts;
 
-  bool get hasCheckingAccount => _accounts.any((acc) => acc.tipoCuenta == 'corriente');
+  bool get hasCheckingAccount =>
+      _accounts.any((acc) => acc.tipoCuenta.toLowerCase() == 'corriente');
 
   List<TransactionModel> _transactions = [];
   List<TransactionModel> get transactions => _transactions;

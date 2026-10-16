@@ -14,10 +14,12 @@ class AccountModel {
   });
 
   factory AccountModel.fromJson(Map<String, dynamic> json) {
+    final rawTipo = (json['tipo_cuenta'] ?? 'ahorro').toString().toLowerCase();
+    final tipo = rawTipo.contains('ahorro') ? 'ahorro' : 'corriente';
     return AccountModel(
       idCuenta: json['id_cuenta'] ?? '',
       idUsuario: json['id_usuario'] ?? '',
-      tipoCuenta: json['tipo_cuenta'] ?? 'ahorro',
+      tipoCuenta: tipo,
       numeroCuenta: json['numero_cuenta'] ?? '',
       saldoCuenta: (json['saldo_cuenta'] ?? 0.0).toDouble(),
     );

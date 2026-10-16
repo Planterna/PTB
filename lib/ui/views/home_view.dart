@@ -10,6 +10,7 @@ import '../widgets/account_card_widget.dart';
 import '../widgets/transaction_item_widget.dart';
 import '../widgets/bottom_nav_bar_widget.dart';
 import '../widgets/glass_container.dart';
+import 'create_current_account_modal.dart';
 import '../../data/models/user_model.dart';
 import '../../data/datasources/remote/remote_finance_datasource.dart';
 import '../../data/repositories/finance_repository.dart';
@@ -244,27 +245,14 @@ class _HomeViewState extends State<HomeView> {
                                 horizontal: 24,
                               ),
                             ),
-                            onPressed: () async {
-                              final error = await _viewModel.createAccount(
-                                tipoCuenta: 'corriente',
+                            onPressed: () {
+                              CreateCurrentAccountModal.show(
+                                context,
+                                repository: _viewModel.repository,
+                                userAccounts: _viewModel.accounts,
+                                defaultOwnerName: widget.user.name,
+                                onSuccess: () => _viewModel.loadData(),
                               );
-                              if (context.mounted) {
-                                if (error == null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('¡Cuenta corriente creada con éxito!'),
-                                      backgroundColor: AppColors.success,
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(error),
-                                      backgroundColor: AppColors.danger,
-                                    ),
-                                  );
-                                }
-                              }
                             },
                             icon: const Icon(Icons.add_circle_outline),
                             label: const Text(
