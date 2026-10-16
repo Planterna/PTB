@@ -9,7 +9,7 @@ class ApiConstants {
   static const String vercelUrl = 'https://ptbbackend.vercel.app/api';
 
   // Alterna entre el backend local (localhost:3000) o Vercel
-  static const bool useLocalBackend = true;
+  static const bool useLocalBackend = false;
 
   static String get baseUrl {
     const customUrl = String.fromEnvironment('BASE_URL');
@@ -32,7 +32,8 @@ class ApiConstants {
   static const String currentAccount = '/cuentas/corriente';
   static const String currentAccountRequests = '/cuentas/solicitudes-corriente';
   static const String validateAccount = '/cuentas/validar';
-  static const String validateInterbankAccount = '/cuentas/validar-interbancaria';
+  static const String validateInterbankAccount =
+      '/cuentas/validar-interbancaria';
   static const String transfer = '/cuentas/transferir';
   static const String transferInterbank = '/cuentas/transferir-interbancaria';
   static const String banks = '/cuentas/bancos';

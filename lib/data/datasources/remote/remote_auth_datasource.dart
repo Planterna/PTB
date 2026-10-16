@@ -18,7 +18,7 @@ class RemoteAuthDataSource {
       ApiConstants.login,
       body: {
         'usuario': cleanUsername,
-        'email': cleanUsername,
+        if (cleanUsername.contains('@')) 'email': cleanUsername,
         'password': cleanPassword,
       },
       requiresAuth: false,
