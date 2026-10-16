@@ -13,6 +13,27 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'Por favor, ingresa tus nombres completos';
     }
+    final nameRegex = RegExp(r'^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$');
+    if (!nameRegex.hasMatch(value.trim())) {
+      return 'Los nombres no deben contener números ni caracteres especiales';
+    }
+    if (value.trim().length < 2) {
+      return 'Ingresa un nombre válido de al menos 2 letras';
+    }
+    return null;
+  }
+
+  static String? validateUsername(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Por favor, ingresa un nombre de usuario';
+    }
+    final usernameRegex = RegExp(r'^[a-zA-Z0-9_\-]+$');
+    if (!usernameRegex.hasMatch(value.trim())) {
+      return 'Solo se permiten letras, números, guion bajo (_) y guion alto (-)';
+    }
+    if (value.trim().length < 3) {
+      return 'El usuario debe tener al menos 3 caracteres';
+    }
     return null;
   }
 

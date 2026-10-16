@@ -89,100 +89,91 @@ class _CustomTextFieldState extends State<CustomTextField> {
     final borderColor = _getCurrentBorderColor();
     final isBorderActive = borderColor != Colors.transparent;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(widget.label)
-            .textColor(AppColors.textMuted)
-            .fontSize(14)
-            .padding(bottom: 8),
-        TextFormField(
-          controller: widget.controller,
-          validator: widget.validator,
-          keyboardType: widget.keyboardType,
-          inputFormatters: widget.inputFormatters,
-          obscureText: widget.isPassword ? _obscureText : false,
-          style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
-          decoration: InputDecoration(
-            hintText: widget.hint,
-            prefixIcon: widget.prefixIcon != null
-                ? Icon(
-                    widget.prefixIcon,
-                    color: _isValid
-                        ? AppColors.accent
-                        : (_hasInteracted && _realtimeError != null
-                            ? AppColors.danger
-                            : AppColors.textMuted),
-                    size: 20,
-                  )
-                : null,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: isBorderActive
-                  ? BorderSide(color: borderColor, width: 1.5)
-                  : BorderSide.none,
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: BorderSide(
-                color: isBorderActive ? borderColor : AppColors.primary,
-                width: 1.5,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
-            ),
-            suffixIcon: widget.isPassword
-                ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (_isValid)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 4.0),
-                          child: Icon(
-                            Icons.check_circle_outline,
-                            color: AppColors.accent,
-                            size: 18,
-                          ),
-                        ),
-                      IconButton(
-                        icon: Icon(
-                          _obscureText
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textMuted,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _obscureText = !_obscureText;
-                          });
-                        },
-                      ),
-                    ],
-                  )
-                : (_isValid
-                    ? const Icon(
-                        Icons.check_circle_outline,
-                        color: AppColors.accent,
-                        size: 20,
-                      )
-                    : (_hasInteracted && _realtimeError != null
-                        ? const Icon(
-                            Icons.error_outline,
-                            color: AppColors.danger,
-                            size: 20,
-                          )
-                        : null)),
+    return <Widget>[
+      Text(widget.label)
+          .textColor(AppColors.textMuted)
+          .fontSize(14)
+          .padding(bottom: 8),
+      TextFormField(
+        controller: widget.controller,
+        validator: widget.validator,
+        keyboardType: widget.keyboardType,
+        inputFormatters: widget.inputFormatters,
+        obscureText: widget.isPassword ? _obscureText : false,
+        style: const TextStyle(color: AppColors.textPrimary, fontSize: 16),
+        decoration: InputDecoration(
+          hintText: widget.hint,
+          prefixIcon: widget.prefixIcon != null
+              ? Icon(
+                  widget.prefixIcon,
+                  color: _isValid
+                      ? AppColors.accent
+                      : (_hasInteracted && _realtimeError != null
+                          ? AppColors.danger
+                          : AppColors.textMuted),
+                  size: 20,
+                )
+              : null,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: isBorderActive
+                ? BorderSide(color: borderColor, width: 1.5)
+                : BorderSide.none,
           ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide(
+              color: isBorderActive ? borderColor : AppColors.primary,
+              width: 1.5,
+            ),
+          ),
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+          ),
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+          ),
+          suffixIcon: widget.isPassword
+              ? <Widget>[
+                  if (_isValid)
+                    const Icon(
+                      Icons.check_circle_outline,
+                      color: AppColors.accent,
+                      size: 18,
+                    ).padding(right: 4.0),
+                  IconButton(
+                    icon: Icon(
+                      _obscureText
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      color: AppColors.textMuted,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _obscureText = !_obscureText;
+                      });
+                    },
+                  ),
+                ].toRow(mainAxisSize: MainAxisSize.min)
+              : (_isValid
+                  ? const Icon(
+                      Icons.check_circle_outline,
+                      color: AppColors.accent,
+                      size: 20,
+                    )
+                  : (_hasInteracted && _realtimeError != null
+                      ? const Icon(
+                          Icons.error_outline,
+                          color: AppColors.danger,
+                          size: 20,
+                        )
+                      : null)),
         ),
-        const SizedBox(height: 16),
-      ],
-    );
+      ),
+      const SizedBox(height: 16),
+    ].toColumn(crossAxisAlignment: CrossAxisAlignment.start);
   }
 }

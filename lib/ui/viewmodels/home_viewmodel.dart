@@ -7,6 +7,7 @@ import '../../data/repositories/finance_repository.dart';
 
 class HomeViewModel extends ChangeNotifier {
   final FinanceRepository _repository;
+  FinanceRepository get repository => _repository;
   final String userId;
 
   bool _isLoading = true;
@@ -20,6 +21,9 @@ class HomeViewModel extends ChangeNotifier {
 
   List<AccountModel> _accounts = [];
   List<AccountModel> get accounts => _accounts;
+
+  bool get hasCheckingAccount =>
+      _accounts.any((acc) => acc.tipoCuenta.toLowerCase() == 'corriente');
 
   List<TransactionModel> _transactions = [];
   List<TransactionModel> get transactions => _transactions;
@@ -91,24 +95,6 @@ class HomeViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return 'Fallo al solicitar tarjeta de crédito: $e';
-    }
-  }
-
-  Future<String?> createAccount({required String tipoCuenta}) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _repository.createAccount(
-        tipoCuenta: tipoCuenta, 
-        saldoCuenta: 0.0, 
-      );
-      await loadData();
-      return null; 
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      return 'Fallo al crear cuenta: $e';
     }
   }
 }

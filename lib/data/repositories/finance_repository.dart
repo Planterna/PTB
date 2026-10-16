@@ -2,6 +2,9 @@ import '../datasources/remote/remote_finance_datasource.dart';
 import '../models/card_model.dart';
 import '../models/transaction_model.dart';
 import '../models/account_model.dart';
+import '../models/verified_account_model.dart';
+import '../models/transfer_result_model.dart';
+import '../models/current_account_request_model.dart';
 
 class FinanceRepository {
   final RemoteFinanceDataSource _remoteDataSource;
@@ -39,6 +42,50 @@ class FinanceRepository {
     return _remoteDataSource.createAccount(
       tipoCuenta: tipoCuenta,
       saldoCuenta: saldoCuenta,
+    );
+  }
+
+  Future<CurrentAccountResponseModel> createCurrentAccount(
+    CurrentAccountRequestModel request,
+  ) {
+    return _remoteDataSource.createCurrentAccount(request);
+  }
+
+  Future<VerifiedAccount> validateAccount(String accountNumber) {
+    return _remoteDataSource.validateAccount(accountNumber);
+  }
+
+  Future<VerifiedAccount> validateInterbankAccount(String accountNumber, {String? bank}) {
+    return _remoteDataSource.validateInterbankAccount(accountNumber, bank: bank);
+  }
+
+  Future<TransferResult> transfer({
+    required String cuentaOrigen,
+    required String cuentaDestino,
+    required double monto,
+    String? descripcion,
+  }) {
+    return _remoteDataSource.transfer(
+      cuentaOrigen: cuentaOrigen,
+      cuentaDestino: cuentaDestino,
+      monto: monto,
+      descripcion: descripcion,
+    );
+  }
+
+  Future<TransferResult> transferInterbank({
+    required String cuentaOrigen,
+    required String cuentaDestino,
+    required double monto,
+    String? banco,
+    String? descripcion,
+  }) {
+    return _remoteDataSource.transferInterbank(
+      cuentaOrigen: cuentaOrigen,
+      cuentaDestino: cuentaDestino,
+      monto: monto,
+      banco: banco,
+      descripcion: descripcion,
     );
   }
 }

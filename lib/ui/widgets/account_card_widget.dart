@@ -25,7 +25,7 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
   @override
   Widget build(BuildContext context) {
     final displayBalance = widget.account.saldoCuenta.toStringAsFixed(2);
-    final isAhorro = widget.account.tipoCuenta == 'ahorro';
+    final isAhorro = widget.account.tipoCuenta.toLowerCase().contains('ahorro');
     final accountTypeLabel = isAhorro ? 'Cuenta de Ahorros' : 'Cuenta Corriente';
 
     // Degradados dinámicos
@@ -67,18 +67,25 @@ class _AccountCardWidgetState extends State<AccountCardWidget> {
           .textColor(mutedColor)
           .fontSize(14),
       <Widget>[
-        _obscureBalance
-            ? ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                child: Text(
-                  '\$$displayBalance',
-                  style: AppTheme.amountStyle(fontSize: 26, color: textColor),
-                ).expanded(),
-              )
-            : Text(
-                '\$$displayBalance',
-                style: AppTheme.amountStyle(fontSize: 26, color: textColor),
-              ).expanded(),
+        (_obscureBalance
+                ? ClipRect(
+                    child: ImageFiltered(
+                      imageFilter: ImageFilter.blur(
+                        sigmaX: 8,
+                        sigmaY: 8,
+                        tileMode: TileMode.decal,
+                      ),
+                      child: Text(
+                        '\$$displayBalance',
+                        style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+                      ),
+                    ),
+                  )
+                : Text(
+                    '\$$displayBalance',
+                    style: AppTheme.amountStyle(fontSize: 26, color: textColor),
+                  ))
+            .expanded(),
                 
         IconButton(
           icon: Icon(

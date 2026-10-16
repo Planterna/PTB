@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:styled_widget/styled_widget.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -21,10 +22,9 @@ class LoginView extends StatefulWidget {
 }
 
 class _LoginViewState extends State<LoginView> {
-  bool _rememberMe = false;
 
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   late LoginViewModel _viewModel;
@@ -39,7 +39,7 @@ class _LoginViewState extends State<LoginView> {
 
   @override
   void dispose() {
-    _emailController.dispose();
+    _usernameController.dispose();
     _passwordController.dispose();
     _viewModel.dispose();
     super.dispose();
@@ -63,42 +63,71 @@ class _LoginViewState extends State<LoginView> {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
+              final isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
+              final screenHeight = constraints.maxHeight;
+
+              // Dimensiones responsivas para el icono y espaciado
+              final double iconSize = isKeyboardOpen
+                  ? 42.0
+                  : (screenHeight * 0.085).clamp(52.0, 76.0);
+              final double iconPadding = (iconSize * 0.22).clamp(10.0, 16.0);
+              final double topSpacing = isKeyboardOpen ? 6.0 : (screenHeight * 0.02).clamp(8.0, 22.0);
+              final double bottomSpacing = isKeyboardOpen ? 12.0 : (screenHeight * 0.03).clamp(14.0, 28.0);
+              final double borderRadius = (iconPadding + 4.0).clamp(12.0, 18.0);
+
               return SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight - 32, // Ocupar pantalla completa si es posible
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        SvgPicture.asset(
-                          AppAssets.logoSmall,
-                          height: 48,
-                          width: 48,
-                        )
-                            .padding(all: 16)
-                            .decorated(
-                              color: AppColors.surface,
-                              borderRadius: BorderRadius.circular(14),
-                            )
-                            .alignment(Alignment.center),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 500,
+                      minHeight: constraints.maxHeight - 32,
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          SizedBox(height: topSpacing),
+                          Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              curve: Curves.easeOutCubic,
+                              padding: EdgeInsets.all(iconPadding),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(borderRadius),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.2),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: SvgPicture.asset(
+                                AppAssets.logoSymbol,
+                                height: iconSize,
+                                width: iconSize,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
 
-                        const SizedBox(height: 32),
+                          SizedBox(height: bottomSpacing),
 
-                        const Text('Iniciar sesión')
-                            .textColor(AppColors.textPrimary)
-                            .fontSize(28)
-                            .fontWeight(FontWeight.bold)
-                            .alignment(Alignment.center),
+                          const Text('Iniciar sesión')
+                              .textColor(AppColors.textPrimary)
+                              .fontSize(28)
+                              .fontWeight(FontWeight.bold)
+                              .alignment(Alignment.center),
 
                         const SizedBox(height: 16),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             const Text('¿No tienes una cuenta? ')
                                 .textColor(AppColors.textMuted)
@@ -123,12 +152,16 @@ class _LoginViewState extends State<LoginView> {
                         const SizedBox(height: 40),
 
                         CustomTextField(
-                          label: 'Correo electrónico',
-                          hint: 'example@example.com',
-                          controller: _emailController,
-                          validator: Validators.validateEmail,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icons.email_outlined,
+                          label: 'Usuario',
+                          hint: 'Ingresa tu usuario',
+                          controller: _usernameController,
+                          validator: Validators.validateUsername,
+                          keyboardType: TextInputType.text,
+                          prefixIcon: Icons.person_outline,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z0-9_\-]')),
+                            LengthLimitingTextInputFormatter(25),
+                          ],
                         ),
 
                         CustomTextField(
@@ -140,44 +173,57 @@ class _LoginViewState extends State<LoginView> {
                           prefixIcon: Icons.lock_outlined,
                         ),
 
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Theme(
-                                  data: ThemeData(
-                                    unselectedWidgetColor: AppColors.textMuted,
-                                  ),
-                                  child: Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        _rememberMe = value ?? false;
-                                      });
-                                    },
-                                    checkColor: AppColors.background,
-                                    activeColor: AppColors.primary,
-                                    materialTapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    visualDensity: const VisualDensity(
-                                      horizontal: -4,
-                                      vertical: -4,
+                      ListenableBuilder(
+                        listenable: _viewModel,
+                        builder: (context, _) => Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Theme(
+                                    data: ThemeData(
+                                      unselectedWidgetColor: AppColors.textMuted,
+                                    ),
+                                    child: Checkbox(
+                                      value: _viewModel.rememberMe,
+                                      onChanged: _viewModel.toggleRememberMe,
+                                      checkColor: AppColors.background,
+                                      activeColor: AppColors.primary,
+                                      materialTapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      visualDensity: const VisualDensity(
+                                        horizontal: -4,
+                                        vertical: -4,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                const SizedBox(width: 8),
-                                const Text('Recuérdame')
-                                    .textColor(AppColors.textMuted)
-                                    .fontSize(14),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: const Text(
+                                      'Recuérdame',
+                                      overflow: TextOverflow.ellipsis,
+                                    )
+                                        .textColor(AppColors.textMuted)
+                                        .fontSize(14),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          const Text('¿Olvidaste tu contraseña?')
-                              .textColor(AppColors.primary)
-                              .fontSize(14)
-                              .fontWeight(FontWeight.w500),
-                        ],
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: const Text(
+                                '¿Olvidaste tu contraseña?',
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.end,
+                              )
+                                  .textColor(AppColors.primary)
+                                  .fontSize(14)
+                                  .fontWeight(FontWeight.w500),
+                            ),
+                          ],
+                        ),
                       ),
 
                       const SizedBox(height: 40),
@@ -191,7 +237,7 @@ class _LoginViewState extends State<LoginView> {
                                 : () async {
                                     if (_formKey.currentState!.validate()) {
                                       final success = await _viewModel.login(
-                                        _emailController.text.trim(),
+                                        _usernameController.text.trim(),
                                         _passwordController.text.trim(),
                                       );
 
@@ -241,8 +287,9 @@ class _LoginViewState extends State<LoginView> {
                   ),
                 ),
               ),
-            );
-          },
+            ),
+          );
+        },
         ),
       ),
     ),
