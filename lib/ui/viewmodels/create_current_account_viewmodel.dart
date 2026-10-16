@@ -4,7 +4,7 @@ import '../../data/models/current_account_request_model.dart';
 import '../../data/repositories/finance_repository.dart';
 
 class CreateCurrentAccountViewModel extends ChangeNotifier {
-  final FinanceRepository _repository;
+  final FinanceRepository repository;
   final List<AccountModel> userAccounts;
   final String defaultOwnerName;
 
@@ -59,11 +59,10 @@ class CreateCurrentAccountViewModel extends ChangeNotifier {
   ];
 
   CreateCurrentAccountViewModel({
-    required FinanceRepository repository,
+    required this.repository,
     required this.userAccounts,
     required this.defaultOwnerName,
-  })  : _repository = repository,
-        _nombreEnDocumentos = defaultOwnerName;
+  }) : _nombreEnDocumentos = defaultOwnerName;
 
   AccountModel? get savingsAccount {
     try {
@@ -163,7 +162,7 @@ class CreateCurrentAccountViewModel extends ChangeNotifier {
         numeroCuentaOrigen: originAccount?.numeroCuenta,
       );
 
-      final result = await _repository.createCurrentAccount(request);
+      final result = await repository.createCurrentAccount(request);
       _responseResult = result;
       _isSubmitting = false;
       notifyListeners();

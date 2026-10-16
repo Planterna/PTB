@@ -97,22 +97,4 @@ class HomeViewModel extends ChangeNotifier {
       return 'Fallo al solicitar tarjeta de crédito: $e';
     }
   }
-
-  Future<String?> createAccount({required String tipoCuenta}) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await _repository.createAccount(
-        tipoCuenta: tipoCuenta, 
-        saldoCuenta: 0.0, 
-      );
-      await loadData();
-      return null; 
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      return 'Fallo al crear cuenta: $e';
-    }
-  }
 }

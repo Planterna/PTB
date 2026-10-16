@@ -382,9 +382,11 @@ Gracias por confiar en Prestige Trust Bank.
                       }
                       // Compartir nativamente con el sistema operativo
                       try {
-                        await Share.share(
-                          shareText,
-                          subject: 'Comprobante de Transferencia PTB - $ref',
+                        await SharePlus.instance.share(
+                          ShareParams(
+                            text: shareText,
+                            subject: 'Comprobante de Transferencia PTB - $ref',
+                          ),
                         );
                       } catch (e) {
                         debugPrint('Error al compartir comprobante: $e');

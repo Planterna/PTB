@@ -1,7 +1,6 @@
+import 'dart:ui' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
-
-import 'package:flutter/gestures.dart';
 import 'package:styled_widget/styled_widget.dart';
 
 import 'settings_view.dart';
