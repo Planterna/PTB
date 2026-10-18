@@ -41,6 +41,26 @@
     For more details:
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
+  <script>
+    // Si el usuario ingresa una ruta directa en la barra de direcciones (ej. /ruta-sin-sentido),
+    // la normalizamos al formato hash (/#/ruta-sin-sentido) antes de iniciar Flutter para que
+    // el enrutador de la aplicación la procese correctamente.
+    (function () {
+      var base = document.querySelector('base');
+      var basePath = base ? new URL(base.href, window.location.origin).pathname : '/';
+      var path = window.location.pathname;
+      if (path && path !== basePath && path !== basePath + 'index.html') {
+        var relativePath = path.startsWith(basePath)
+          ? '/' + path.slice(basePath.length)
+          : path;
+        window.history.replaceState(
+          null,
+          '',
+          basePath + '#' + relativePath + window.location.search
+        );
+      }
+    })();
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>
